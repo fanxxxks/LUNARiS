@@ -6,9 +6,9 @@ let flowData=null,flowKey='',flowClock=0,benchmark=null,lastRenderAt=0;
 let previewMove=null,walking=false,sectionMode=false,needsRender=true,rafPending=false,inFrame=false,lastNow=performance.now(),snapshotCache=null;
 let selectedRoom=1,visibleFloor=-1,manualMode=false,pendingManual=false,cutaway=false,viewName='overview',roaming=false,routeKey='',toastTimer;
 let yaw=.72,pitch=.2,distance=1230,target=new T.Vector3(-30,212,0),goal={yaw:.72,pitch:.2,distance:1230,target:new T.Vector3(-30,212,0)};
-const freePosition=new T.Vector3(),held=new Set();let freeYaw=0,freePitch=0;
+const freePosition=new T.Vector3(),held=new Set();let freeYaw=0,freePitch=0,roamSpeed=1;
 const mobile=()=>window.innerWidth<=760;
-let activePanel=null,naturalPlan=null,scheduling=false,railTimer=null,railPinned=false;
+let activePanel=null,chosenMission=null,naturalPlan=null,scheduling=false,railTimer=null,railPinned=false;
 const railZone='.sidebar,.side-panel,.view-cluster,.inspection-stack';
 function expandRail(open){document.body.classList.toggle('rail-open',open);$('railToggle').setAttribute('aria-expanded',String(open));$('railToggle').setAttribute('aria-label',railPinned?'收起左侧导航':open?'固定展开左侧导航':'展开左侧导航');}
 function scheduleRailClose(){clearTimeout(railTimer);railTimer=setTimeout(()=>{if(railPinned)return;const focused=document.activeElement;if(focused?.closest?.(railZone)&&(['INPUT','TEXTAREA','SELECT'].includes(focused.tagName)||focused.matches?.(':focus-visible')))return;showPanel(null);expandRail(false);},350);}
@@ -20,7 +20,7 @@ document.addEventListener('focusout',e=>{if(e.target.closest?.(railZone))schedul
 $('railToggle').onclick=()=>{railPinned=!railPinned;expandRail(railPinned);if(!railPinned){showPanel(null);$('railToggle').blur();}};
 const panelOpeners={missionPanel:'openMissions',schedulerPanel:'openScheduler',viewPanel:'openViews',floorPanel:'openFloors'};
 function showPanel(id,focus=false){
- const previous=activePanel;activePanel=id;held.clear();if(id){clearTimeout(railTimer);expandRail(true);if(previous!==id)$(id).scrollTop=0;}
+ const previous=activePanel;activePanel=id;if(previous==='floorPanel'&&id!=='floorPanel')exitManual();if(id!=='viewPanel')showOtherViews(false);held.clear();if(id){clearTimeout(railTimer);expandRail(true);if(previous!==id)$(id).scrollTop=0;}
  for(const [panel,opener] of Object.entries(panelOpeners)){
   $(panel).hidden=panel!==id;$(opener).classList.toggle('active',panel===id);$(opener).setAttribute('aria-expanded',String(panel===id));
  }
@@ -28,6 +28,13 @@ function showPanel(id,focus=false){
  else if(focus&&previous)$(panelOpeners[previous]).focus();
 }
 for(const [panel,opener] of Object.entries(panelOpeners))$(opener).onclick=()=>showPanel(activePanel===panel?null:panel);
+function showOtherViews(open){$('otherViewsMenu').hidden=!open;$('otherViewsToggle').setAttribute('aria-expanded',String(open));}
+$('otherViews').addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')showOtherViews(true);});
+$('otherViews').addEventListener('pointerleave',()=>{if(!$('otherViews').contains(document.activeElement))showOtherViews(false);});
+$('otherViews').addEventListener('focusout',e=>{if(!$('otherViews').contains(e.relatedTarget))showOtherViews(false);});
+$('otherViewsToggle').onclick=()=>showOtherViews($('otherViewsMenu').hidden);
+$('otherViewsToggle').addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();showOtherViews(true);$('closeup').focus();}});
+$('otherViews').addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('otherViewsMenu').hidden){e.preventDefault();e.stopPropagation();showOtherViews(false);$('otherViewsToggle').focus();}});
 document.querySelectorAll('[data-close-panel]').forEach(button=>button.onclick=()=>showPanel(null,true));
 document.addEventListener('click',event=>{if(activePanel&&!event.target.closest(railZone)&&event.target.tagName!=='CANVAS')showPanel(null);});
 const overviewDistance=()=>mobile()?1320:1230;
@@ -47,7 +54,7 @@ for(let level=0;level<C.config.layers;level++){
  const item=document.createElement('div');item.className='floor-item';item.dataset.level=level;floorItems.push(item);
  const button=document.createElement('button');button.className='floor-select';button.setAttribute('aria-label',`单独观察 L${level+1} 层`);button.setAttribute('aria-pressed','false');button.innerHTML=`<span>L${level+1}</span>`;button.onclick=()=>setFloor(visibleFloor===level?-1:level);item.appendChild(button);
  const grid=document.createElement('div');grid.className='floor-grid';grid.hidden=level!==mapFloor;item.appendChild(grid);
- C.nodes.forEach((node,i)=>{if(node.level!==level)return;const b=document.createElement('button');b.className='bay-dot'+(node.lift?' lift':'');b.style.gridColumn=String(node.col+3);b.style.gridRow=String(node.row+2);b.textContent=node.lift?node.shaft:'';b.dataset.node=i;b.onclick=()=>selectBay(i);grid.appendChild(b);mapButtons.push(b);});$('floorMaps').appendChild(item);
+ C.nodes.forEach((node,i)=>{if(node.level!==level)return;const b=document.createElement('button');b.className='bay-dot'+(node.lift?' lift':'');b.style.gridColumn=String(node.col+3);b.style.gridRow=String(node.row+2);b.textContent='＋';b.dataset.node=i;b.onclick=()=>selectBay(i);grid.appendChild(b);mapButtons.push(b);});$('floorMaps').appendChild(item);
 }
 function setMapFloor(level){mapFloor=level;floorItems.forEach(item=>{const active=Number(item.dataset.level)===level;item.classList.toggle('map-current',active);item.children[1].hidden=!active;});}
 function applyFloorSelection(level){visibleFloor=level;if(level>=0)setMapFloor(level);$('allFloors').classList.toggle('active',level<0);$('allFloors').setAttribute('aria-pressed',String(level<0));floorItems.forEach(item=>{const active=Number(item.dataset.level)===level;item.classList.toggle('selected',active);item.querySelector('button').setAttribute('aria-pressed',String(active));});}
@@ -58,8 +65,8 @@ function controls(){
  document.body.classList.toggle('manual-mode',manualMode||pendingManual);
  putText('play',!ready?'暂无可用计划':estop?'解除急停':playing?'Ⅱ 暂停演示':manualMode&&phases.length===0?'等待手动指令':time>=duration&&duration?'↺ 再次演示':time>0?'▶ 继续演示':'▶ 开始演示');
  $('play').disabled=!ready||(!phases.length&&!estop);$('timeline').disabled=!phases.length||estop;$('replay').disabled=!phases.length;$('export').disabled=!ready;
- $('manual').classList.toggle('active',manualMode);$('manual').setAttribute('aria-pressed',String(manualMode));$('manualControls').hidden=!manualMode;
- missionButtons.forEach(b=>{const active=b.dataset.task===task;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
+ $('manual').classList.toggle('active',manualMode);$('manual').setAttribute('aria-pressed',String(manualMode));
+ missionButtons.forEach(b=>{const active=b.dataset.task===task&&b.dataset.task===chosenMission;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
 }
 function updateViewButtons(){viewButtons.forEach(id=>{$(id).classList.toggle('active',id===viewName);$(id).setAttribute('aria-pressed',String(id===viewName));});}
 function chooseView(name){
@@ -78,7 +85,7 @@ for(const id of viewButtons)$(id).onclick=()=>chooseView(id);
 function showPlan(){
  $('timeline').max=duration||1;putText('total',String(moves.length));putText('distance',metres(moves.reduce((sum,m)=>sum+C.length(m.path),0))+' m');putText('verticalDistance',String(Math.round(moves.reduce((s,m)=>s+m.vertical,0)*C.config.metresPerUnit)));
  putText('planDistance',metres(moves.reduce((sum,m)=>sum+C.length(m.path),0)));
- $('log').innerHTML=moves.map(m=>`<li>${buildingNames[m.room]}<br>${C.nodes[m.from].label} → ${C.nodes[m.to].label}${m.vertical?' · 跨层':''}</li>`).join('')||'<li>选择建筑后，使用六向按钮或点击空闲泊位。</li>';
+ $('log').innerHTML=moves.map(m=>`<li>${buildingNames[m.room]}<br>${C.nodes[m.from].label} → ${C.nodes[m.to].label}${m.vertical?' · 跨层':''}</li>`).join('')||'<li>选择建筑后，使用房间与空闲泊位。</li>';
 }
 function compile(name,auto=true){
  naturalPlan=null;task=name;manualMode=false;pendingManual=false;estop=false;playing=false;time=0;baseLayout=C.initial.slice();baseElevators=C.config.baseY;previewMove=null;events=[];selectedRoom=C.missions[name].roomIds[0];
@@ -86,7 +93,7 @@ function compile(name,auto=true){
  catch(e){moves=[];phases=[];duration=0;ready=false;notify(e.message,true);}
  showPlan();setFloor(-1);chooseView('overview');controls();drawUI(snapshot());
 }
-missionButtons.forEach(b=>b.onclick=()=>compile(b.dataset.task,true));
+missionButtons.forEach(b=>b.onclick=()=>{chosenMission=b.dataset.task;compile(b.dataset.task,true);});
 function scheduleStamp(){return JSON.stringify({time,phases:phases.length,base:baseLayout,layout:snapshot().layout,blocked:blocked(),estop,task});}
 function computeNaturalPlan(text,layout,closed){
  const source=$('schedulerWorkerSource')?.textContent;
@@ -121,6 +128,7 @@ $('scheduleForm').onsubmit=async e=>{
  }catch(error){$('scheduleStatus').classList.add('bad');putText('scheduleStatus',error.message);}
  finally{scheduling=false;$('scheduleSubmit').disabled=false;requestRender();}
 };
+$('scheduleReset').onclick=()=>{$('scheduleInput').value='';$('scheduleInput').focus();};
 $('scheduleInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('scheduleForm').requestSubmit();}});
 $('motionHighlight').onchange=()=>requestRender();
 // One reusable edge geometry per room, drawn after opaque geometry with depth disabled.
@@ -133,8 +141,8 @@ function updateMotionOverlay(st){
  const inTransfer=st.phase&&time>0&&time<duration,completedTargets=naturalPlan&&time>=duration?naturalPlan.roomIds:[];
  const active=inTransfer?st.phase.room:-1;
  roomOutlines.forEach((outline,id)=>{outline.visible=completedTargets.includes(id)||$('motionHighlight').checked&&id===active;if(outline.visible){outline.position.copy(rooms[id].position);outline.rotation.copy(rooms[id].rotation);}});
- const bubble=$('motionBubble'),leader=$('motionLeader');bubble.hidden=leader.hidden=active<0;
- if(active<0)return;
+ const bubble=$('motionBubble'),leader=$('motionLeader');bubble.hidden=leader.hidden=active<0||!$('motionHighlight').checked;
+ if(bubble.hidden)return;
  const rect=stage.getBoundingClientRect(),anchor=rooms[active].position.clone().add(new T.Vector3(0,C.config.height+3,0));station.localToWorld(anchor);anchor.project(camera);
  if(anchor.z< -1||anchor.z>1){bubble.hidden=leader.hidden=true;return;}
  const x=rect.left+(anchor.x+1)*rect.width/2,y=rect.top+(1-anchor.y)*rect.height/2;
@@ -157,11 +165,14 @@ document.addEventListener('click',e=>{if(!e.target.closest('.speed-control'))clo
 $('play').onclick=()=>{if(!ready)return;if(estop){estop=false;notify('急停已解除。');}if(time>=duration)time=0;playing=!playing;if(playing&&(cutaway||viewName==='closeup'))chooseView('overview');audit(playing?'play':'pause');controls();};
 $('replay').onclick=()=>{time=0;playing=true;estop=false;pendingManual=false;if(cutaway||viewName==='closeup')chooseView('overview');audit('restart');controls();};
 $('timeline').oninput=e=>{if(estop)return;playing=false;pendingManual=false;const requested=Number(e.target.value);time=Math.abs(duration-requested)<.025?duration:Math.max(0,Math.min(duration,requested));audit('seek');controls();drawUI(snapshot());};
+function exitManual(){
+ manualMode=false;pendingManual=false;previewMove=null;chooseView('overview');controls();drawUI(snapshot());
+}
 function enterManual(){
  naturalPlan=null;const st=snapshot();baseLayout=st.layout.slice();baseElevators=structuredClone(st.elevators);moves=[];phases=[];duration=0;time=0;playing=false;manualMode=true;pendingManual=false;task='manual';previewMove=null;estop=false;ready=true;roaming=false;cutaway=false;if(viewName==='roam'||viewName==='mechanism')chooseView('overview');showPlan();controls();drawUI(snapshot());audit('manual-start',{layout:baseLayout.slice()});
 }
 $('manual').onclick=()=>{
- if(manualMode){manualMode=false;previewMove=null;controls();return;}
+ if(manualMode){exitManual();return;}
  if(estop){notify('请先解除急停，再开始手动调度。',true);return;}
  const st=snapshot();if(time>0&&time<duration&&st.phase){pendingManual=true;playing=true;cutaway=false;notify('当前建筑停靠后进入手动调度，保留已完成的布局。');controls();}else enterManual();
 };
@@ -172,6 +183,7 @@ function moveSelected(to){
   const transfer=C.move(layout,from,to,blocked());
   baseLayout=layout.slice();baseElevators=structuredClone(current.elevators);moves=[transfer];previewMove=null;
   const tl=C.timeline(moves,32,baseElevators);phases=tl.phases;duration=tl.duration;time=0;ready=true;
+  if(activePanel==='floorPanel'){railPinned=true;clearTimeout(railTimer);expandRail(true);}
   chooseView('overview');playing=true;showPlan();audit('manual-transfer',{room:selectedRoom,path:transfer.path});controls();drawUI(snapshot());
  }catch(e){notify(e.message,true);requestRender();}
 }
@@ -211,7 +223,7 @@ renderer.domElement.addEventListener('pointermove',e=>{
  if(!roaming)syncInput();else requestRender();
 });
 for(const event of ['pointerup','pointercancel'])renderer.domElement.addEventListener(event,e=>{if(event==='pointerup'&&drag&&!drag.moved&&e.button!==2&&!roaming)pick(e.clientX,e.clientY);pointers.delete(e.pointerId);pinch=0;pinchCenter=null;drag=null;});
-renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();if(roaming){const forward=new T.Vector3(Math.sin(freeYaw)*Math.cos(freePitch),Math.sin(freePitch),Math.cos(freeYaw)*Math.cos(freePitch));freePosition.addScaledVector(forward,-e.deltaY*.15);}else goal.distance=Math.max(110,Math.min(3100,goal.distance*Math.exp(e.deltaY*.00085)));if(!roaming)syncInput();requestRender();},{passive:false});
+renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();if(roaming){const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?window.innerHeight:1);roamSpeed=Math.max(.1,Math.min(8,roamSpeed*Math.exp(-Math.max(-600,Math.min(600,delta))*.002)));notify(`漫游速度 · ${roamSpeed.toFixed(1)}×`);}else goal.distance=Math.max(110,Math.min(3100,goal.distance*Math.exp(e.deltaY*.00085)));if(!roaming)syncInput();requestRender();},{passive:false});
 let focusBefore=null;function openSettings(){held.clear();showPanel(null);focusBefore=document.activeElement;$('settings').hidden=false;$('closeSettings').focus();}function closeSettings(){$('settings').hidden=true;focusBefore?.focus();}
 $('openSettings').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('settings').onclick=e=>{if(e.target===$('settings'))closeSettings();};
 $('stop').onclick=()=>{playing=false;estop=true;pendingManual=false;audit('emergency-stop');controls();closeSettings();notify('已急停。所有建筑保持当前位置，点击“解除急停”继续。',true);};
@@ -248,9 +260,9 @@ function drawUI(st){
  const location=st.active===selectedRoom&&['translate','elevate'].includes(st.type)?'运输中':C.nodes[arriving?st.phase.to:node]?.label||'运输中';
  putText('selectedInfo',location);
  putText('coordX',metres(p[0]));putText('coordY',metres(p[1]));putText('coordZ',metres(p[2]));
- putText('phase',estop?'已急停':cutaway?'精简框架 · 演示已暂停':!ready?'当前布局暂无有效路径':manualMode&&!phases.length?'手动调度 · 请选择方向':`${taskNames[task]} · ${naturalPlan&&!moves.length?'目标已满足':time===0?'已就绪':phaseNames[st.type]}`);
+ putText('phase',estop?'已急停':cutaway?'精简框架 · 演示已暂停':!ready?'当前布局暂无有效路径':manualMode&&!phases.length?'手动调度 · 请选择泊位':`${taskNames[task]} · ${naturalPlan&&!moves.length?'目标已满足':time===0?'已就绪':phaseNames[st.type]}`);
  putText('time',`${fmt(time)} / ${fmt(duration)}`);$('timeline').value=String(time);putText('completed',String(st.finished));
- putText('detail',cutaway?'隐藏舱体，观察融入楼板与接缝的承重梁、导轨和内部升降机构。':estop?'建筑保持当前状态，解除急停后继续。':pendingManual?'正在完成当前搬运，停靠后进入手动调度。':time===0?'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。':st.phase?`${st.active>=0?buildingNames[st.active]:'对接机构'} · ${C.nodes[st.phase.from].label} → ${C.nodes[st.phase.to].label} · ${phaseNames[st.type]}${st.type==='elevate'?' · Y = '+metres(st.head[1])+' m':''}`:st.type==='done'?'任务完成。可切换楼层观察布局，或开启手动六向调度。':'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。');
+ putText('detail',cutaway?'隐藏舱体，观察融入楼板与接缝的承重梁、导轨和内部升降机构。':estop?'建筑保持当前状态，解除急停后继续。':pendingManual?'正在完成当前搬运，停靠后进入手动调度。':time===0?'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。':st.phase?`${st.active>=0?buildingNames[st.active]:'对接机构'} · ${C.nodes[st.phase.from].label} → ${C.nodes[st.phase.to].label} · ${phaseNames[st.type]}${st.type==='elevate'?' · Y = '+metres(st.head[1])+' m':''}`:st.type==='done'?'任务完成。可切换楼层观察布局，或开启手动调度。':'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。');
  $('flightTelemetry').hidden=true;
  const busy=phases.length>0&&time<duration;
  const targetKey=st.layout.join(',')+'|'+selectedRoom+'|'+manualMode+'|'+busy+'|'+estop+'|'+blocked().join(',');
@@ -260,12 +272,12 @@ function drawUI(st){
   if(mapStates[index]===key)continue;mapStates[index]=key;
   b.classList.toggle('empty',room===null);b.classList.toggle('chosen',room===selectedRoom);b.classList.toggle('active',movingHere);b.classList.toggle('reachable',reachable);
   b.disabled=room===null&&!reachable;b.style.setProperty('--room-color',room===null?'#607f98':roomPalette[roomTypes[room]].color);b.dataset.room=room===null?'':String(room);
-  b.textContent=room===null?(C.nodes[index].shaft||'＋'):String(room+1).padStart(2,'0');
+  b.textContent=room===null?'＋':String(room+1).padStart(2,'0');
   b.setAttribute('aria-label',`${C.nodes[index].label}：${room===null?(reachable?'可达空位，点击搬运':'不可达空位'):buildingNames[room]}`);b.title=`${C.nodes[index].label} · ${room===null?(reachable?'点击立即搬运':'当前不可达'):buildingNames[room]}`;
  }
  putText('manualState',estop?'已急停':pendingManual?'等待停靠':manualMode&&busy?'搬运中':'已选中');
  axisButtons.forEach(b=>{const to=C.neighbor(node,Number(b.dataset.axis),Number(b.dataset.sign)),available=to!==undefined&&C.edgeClear(node,to,st.layout,selectedRoom,blocked());b.disabled=Boolean(estop||busy||!available);});
- putText('manualHint',estop?'已急停，请先恢复播放。':pendingManual?'当前房间停靠后切换手动调度。':manualMode&&busy?'搬运中 · 停靠后可继续操作。':'选房间，再点黄色空位或方向即可搬运。');
+ putText('manualHint',estop?'已急停，请先恢复播放。':pendingManual?'当前房间停靠后切换手动调度。':manualMode&&busy?'搬运中 · 停靠后可继续操作。':'选房间，再点黄色“＋”即可搬运。');
 }
 function updateRoute(st){
  const current=previewMove||(st.phase?moves[st.phase.moveIndex]:null),key=current?current.room+'|'+current.from+'|'+current.to+'|'+(previewMove?'preview':'flight'):'';
@@ -293,7 +305,7 @@ function draw(dt,now,force=false){
  updateRoute(st);
  if(viewName==='closeup'&&!roaming){const p=st.positions[selectedRoom];goal.target.set(p[0],p[1]+35,p[2]);}
  else if($('follow').checked&&playing&&st.active>=0&&!roaming){goal.target.set(st.head[0],st.head[1]+35,st.head[2]);}
- if(roaming){const forward=new T.Vector3(Math.sin(freeYaw),0,Math.cos(freeYaw)),right=new T.Vector3(-Math.cos(freeYaw),0,Math.sin(freeYaw)),speed=dt*(held.has('ShiftLeft')||held.has('ShiftRight')?230:75);if(held.has('KeyW'))freePosition.addScaledVector(forward,speed);if(held.has('KeyS'))freePosition.addScaledVector(forward,-speed);if(held.has('KeyD'))freePosition.addScaledVector(right,speed);if(held.has('KeyA'))freePosition.addScaledVector(right,-speed);if(held.has('KeyE'))freePosition.y+=speed;if(held.has('KeyQ'))freePosition.y-=speed;freePosition.y=Math.max(terrainY(freePosition.x,freePosition.z)+7,Math.min(2500,freePosition.y));freePosition.x=Math.max(-3500,Math.min(3500,freePosition.x));freePosition.z=Math.max(-3500,Math.min(3500,freePosition.z));camera.position.copy(freePosition);camera.lookAt(freePosition.x+Math.sin(freeYaw)*Math.cos(freePitch),freePosition.y+Math.sin(freePitch),freePosition.z+Math.cos(freeYaw)*Math.cos(freePitch));}
+ if(roaming){const forward=new T.Vector3(Math.sin(freeYaw),0,Math.cos(freeYaw)),right=new T.Vector3(-Math.cos(freeYaw),0,Math.sin(freeYaw)),speed=dt*roamSpeed*(held.has('ShiftLeft')||held.has('ShiftRight')?230:75);if(held.has('KeyW'))freePosition.addScaledVector(forward,speed);if(held.has('KeyS'))freePosition.addScaledVector(forward,-speed);if(held.has('KeyD'))freePosition.addScaledVector(right,speed);if(held.has('KeyA'))freePosition.addScaledVector(right,-speed);if(held.has('KeyE'))freePosition.y+=speed;if(held.has('KeyQ'))freePosition.y-=speed;freePosition.y=Math.max(terrainY(freePosition.x,freePosition.z)+7,Math.min(2500,freePosition.y));freePosition.x=Math.max(-3500,Math.min(3500,freePosition.x));freePosition.z=Math.max(-3500,Math.min(3500,freePosition.z));camera.position.copy(freePosition);camera.lookAt(freePosition.x+Math.sin(freeYaw)*Math.cos(freePitch),freePosition.y+Math.sin(freePitch),freePosition.z+Math.cos(freeYaw)*Math.cos(freePitch));}
  else{const ease=reducedMotion?1:1-Math.exp(-dt*8);yaw+=(goal.yaw-yaw)*ease;pitch+=(goal.pitch-pitch)*ease;distance+=(goal.distance-distance)*ease;target.lerp(goal.target,ease);const dist=distance*Math.max(1,.9/camera.aspect);camera.position.set(target.x+Math.sin(yaw)*Math.cos(pitch)*dist,target.y+Math.sin(pitch)*dist,target.z+Math.cos(yaw)*Math.cos(pitch)*dist);camera.lookAt(target);if(Math.abs(goal.yaw-yaw)<.00001&&Math.abs(goal.pitch-pitch)<.00001&&Math.abs(goal.distance-distance)<.02&&target.distanceTo(goal.target)<.02){yaw=goal.yaw;pitch=goal.pitch;distance=goal.distance;target.copy(goal.target);}}
  camera.updateMatrixWorld();updateMotionOverlay(st);const labelRoom=st.active>=0&&time>0?st.active:selectedRoom,r=rooms[labelRoom],v=r.position.clone().add(new T.Vector3(0,85,0)).project(camera),w=stage.clientWidth,h=stage.clientHeight,sx=(v.x+1)*w/2,sy=(1-v.y)*h/2;
  activeLabel.hidden=!$('labels').checked||!r.userData.visible||v.z>1||v.z< -1||sx<60||sx>w-60||sy<70||sy>h-20;const labelText=`${buildingNames[labelRoom]}${st.type==='elevate'?'  ↑↓ Y '+metres(st.head[1])+' m':''}`;if(activeLabel.textContent!==labelText)activeLabel.textContent=labelText;if(!activeLabel.hidden){activeLabel.style.transform=`translate3d(${sx}px,${sy}px,0) translate(-50%,-100%)`;activeLabel.style.left='0';activeLabel.style.top='0';}

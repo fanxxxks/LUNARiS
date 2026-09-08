@@ -333,6 +333,14 @@ body{font-size:16px;font-family:'Lunaris Display','Microsoft YaHei','PingFang SC
 @media(max-width:760px){:root{--rail-wide:244px}.sidebar .top-action>span{font-size:16px}.sidebar .immersion-action>span{font-size:16px}.side-panel,.view-cluster,.inspection-stack{width:calc(100vw - var(--rail));padding:17px}.panel-top strong{font-size:19px}.mission strong{font-size:17px}.player{grid-template-columns:minmax(0,1fr);padding:13px 12px;gap:10px}.play-button{font-size:13px;min-width:116px;padding:6px 9px}.replay{font-size:13px;padding:6px 8px}.speed-toggle{font-size:14px;min-width:54px;min-height:36px;padding:6px 7px}.speed-toggle:after{margin-left:5px}.time-top{font-size:12px}.time-top>span{font-size:11px}.dispatch-room .selected-title{font-size:20px}.dispatch-panel .six-axis button{gap:5px;font-size:13px}.dispatch-panel .floor-grid{grid-template-rows:repeat(3,34px)}.dispatch-panel #floorMaps{padding-bottom:137px}}
 @media(prefers-reduced-motion:reduce){.six-axis button>span{transform:none!important;transition:none!important}}
 
+/* Progressive detail disclosure keeps the working panels compact. */
+.mission{align-items:flex-start}.mission>.action-icon{margin-top:5px}.mission-copy{display:block;min-width:0;flex:1}.mission strong{display:block;white-space:nowrap}
+.mission:before{top:19px;transform:none}.mission-detail{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .24s ease,opacity .2s ease;text-align:left}.mission-detail>span{overflow:hidden;min-height:0;color:#cad0c7;font:400 13px/1.8 'Microsoft YaHei',sans-serif;letter-spacing:0}.mission-detail b{display:block;color:#edf1df;font-size:12px;margin:14px 0 4px}
+.mission:is(:hover,:focus-visible) .mission-detail{grid-template-rows:1fr;opacity:1}.mission:is(:hover,:focus-visible){transform:none}.mission.active:not(:hover):not(:focus-visible){background-color:#292e30;border-color:#ffffff38;color:#e8edeb}.mission.active:not(:hover):not(:focus-visible):before{background:#69736b;box-shadow:none}
+#scheduleInput::placeholder{color:#a1a6a4;opacity:1}.command-actions{display:flex;gap:10px}.command-actions .command-submit{flex:1;min-width:0;width:auto;gap:10px;padding:10px}.command-actions .command-submit>span{font-size:16px}.command-reset{min-width:66px;border:1px solid #68716a;border-radius:3px;background:#292e30;color:#e3e8df;font-size:15px}.command-reset:is(:hover,:focus-visible){border-color:#f4ff00;color:#f4ff00;background:#363d26}.command-hint{font:400 12px/1.6 'Microsoft YaHei',sans-serif;color:#979f98;margin:12px 0 0}
+.view-primary{display:flex;flex-direction:column}.view-primary>button,.other-views>button{width:100%;text-align:left;padding:12px 16px}.other-views>button{display:flex;justify-content:space-between;align-items:center}.other-views>button[aria-expanded=true]{border-color:#c4d044;color:#f4ff00}.view-secondary{display:grid;grid-template-columns:1fr;gap:7px;margin:10px 0 0 16px;padding-left:12px;border-left:1px solid #737c43}.view-secondary button{width:100%;text-align:left;padding:10px 14px;background:#222924;font-size:14px}.view-secondary button.active{border-color:#c4d044;color:#f4ff00}
+@media(prefers-reduced-motion:reduce){.mission-detail{transition:none}}
+
 </style>
 </head>
 <body>
@@ -352,20 +360,19 @@ body{font-size:16px;font-family:'Lunaris Display','Microsoft YaHei','PingFang SC
 </aside>
 <section id="missionPanel" class="side-panel mission-panel" aria-label="典型任务" hidden><div class="panel-top"><strong>典型任务</strong><button class="panel-close" data-close-panel aria-label="关闭典型任务"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
  <nav class="missions" aria-label="演示任务">
-  <button class="mission active" data-task="vertical" aria-pressed="true"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 27V6m-5 5 5-5 5 5M23 5v21m-5-5 5 5 5-5M14 16h4"/></svg><span><strong>科研协作案例</strong></span></button>
-  <button class="mission" data-task="cascade" aria-pressed="false"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 4h10v10H4zM18 18h10v10H18zM18 9h10M23 4l5 5-5 5M14 23H4m5-5-5 5 5 5"/></svg><span><strong>维修隔离案例</strong></span></button>
-  <button class="mission" data-task="district" aria-pressed="false"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 4h9v9H4zM19 4h9v9h-9zM4 19h9v9H4zM19 23h10M24 18v10"/></svg><span><strong>基地扩建案例</strong></span></button>
+  <button class="mission" data-task="vertical" aria-pressed="false"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 27V6m-5 5 5-5 5 5M23 5v21m-5-5 5 5 5-5M14 16h4"/></svg><span class="mission-copy"><strong>科研协作案例</strong><span class="mission-detail"><span><b>移动目标</b>R02、R03、R08 → L2 科研组团，搬运结束后释放全部升降通道。<b>移动意义</b>让协作房间同层相邻，减少跨层往返。</span></span></span></button>
+  <button class="mission" data-task="cascade" aria-pressed="false"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 4h10v10H4zM18 18h10v10H18zM18 9h10M23 4l5 5-5 5M14 23H4m5-5-5 5 5 5"/></svg><span class="mission-copy"><strong>维修隔离案例</strong><span class="mission-detail"><span><b>移动目标</b>R24 → L1 东缘检修位，相邻两处泊位留空；R11 补位顶层。<b>移动意义</b>为故障舱预留检修缓冲，并恢复顶层节点。</span></span></span></button>
+  <button class="mission" data-task="district" aria-pressed="false"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 4h9v9H4zM19 4h9v9h-9zM4 19h9v9H4zM19 23h10M24 18v10"/></svg><span class="mission-copy"><strong>基地扩建案例</strong><span class="mission-detail"><span><b>移动目标</b>启用 L2 两处预留翼部泊位，入驻量由 6 舱增至 8 舱。<b>移动意义</b>迁入现有房间、释放首层物流空间，不新增舱体。</span></span></span></button>
  </nav>
 </section>
 <section id="schedulerPanel" class="side-panel scheduler-panel" aria-label="自然语言调度" hidden><div class="panel-top"><strong>自然语言调度</strong><button class="panel-close" data-close-panel aria-label="关闭自然语言调度"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
- <form id="scheduleForm"><label for="scheduleInput" class="sr-only">调度目标</label><textarea id="scheduleInput" maxlength="240" rows="4" placeholder="构建一条直线相连的居住模块、材料模块、通信模块" aria-describedby="scheduleStatus">构建一条直线相连的居住模块、材料模块、通信模块</textarea>
- <button id="scheduleSubmit" type="submit" class="command-submit"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="m2 5 14 23L30 5H2zm7 12 7-12 7 12H9z" fill="currentColor" fill-rule="evenodd"/></svg><span>执行调度</span></button></form>
+ <form id="scheduleForm"><label for="scheduleInput" class="sr-only">调度目标</label><textarea id="scheduleInput" maxlength="240" rows="4" placeholder="例：构建一条直线相连的居住模块、材料模块、通信模块" aria-describedby="scheduleHint scheduleStatus"></textarea>
+ <div class="command-actions"><button id="scheduleSubmit" type="submit" class="command-submit"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="m2 5 14 23L30 5H2zm7 12 7-12 7 12H9z" fill="currentColor" fill-rule="evenodd"/></svg><span>执行调度</span></button><button id="scheduleReset" type="button" class="command-reset" title="清空输入">重置</button></div><p id="scheduleHint" class="command-hint">输入 2–5 个模块，按顺序直线连接。</p></form>
  <p id="scheduleStatus" class="command-status" role="status" aria-live="polite"></p><ol id="scheduleTargets" class="command-targets"></ol>
 </section>
 <div id="stage" class="stage" role="img" aria-label="五层紧凑月面模块聚落。24 个房间以积木式错层退台堆叠，六向舱口连接相邻单元，三条内部升降通道支持空间重构。拖动旋转，右键拖动平移，滚轮缩放。"></div>
 <section id="viewPanel" class="view-cluster" aria-label="视图切换" hidden><div class="panel-top"><strong>视图切换</strong><button class="panel-close" data-close-panel aria-label="关闭观察面板"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
- <div class="view-tools" role="group" aria-label="观察方式"><button id="overview" class="active" aria-pressed="true">全景</button><button id="closeup" aria-pressed="false">房间近景</button><button id="topview" aria-pressed="false">俯视</button><button id="elevation" aria-pressed="false">立面</button><span class="divider"></span><button id="mechanism" aria-pressed="false">框架透视</button><button id="roam" aria-pressed="false">自由漫游</button></div>
- <div class="analysis-tools" role="group" aria-label="空间分析"><button id="walkthrough" aria-pressed="false">人流热力</button><button id="sectionView" aria-pressed="false">舱内剖切</button></div>
+ <div class="view-tools view-primary" role="group" aria-label="观察方式"><button id="overview" class="active" aria-pressed="true">全景</button><button id="roam" aria-pressed="false">自由漫游</button><div id="otherViews" class="other-views"><button id="otherViewsToggle" aria-expanded="false" aria-controls="otherViewsMenu">其它 <span aria-hidden="true">＋</span></button><div id="otherViewsMenu" class="view-secondary" role="group" aria-label="其它视图" hidden><button id="closeup" aria-pressed="false">房间近景</button><button id="topview" aria-pressed="false">俯视</button><button id="elevation" aria-pressed="false">立面</button><button id="mechanism" aria-pressed="false">框架透视</button><button id="walkthrough" aria-pressed="false">人流热力</button><button id="sectionView" aria-pressed="false">舱内剖切</button></div></div></div>
  <aside id="trafficPanel" class="traffic-panel" aria-label="人流热图分析" hidden><div class="panel-heading"><strong>人流热图</strong><span class="analysis-tag">需求假设</span></div><label class="traffic-row" for="flowScenario">使用场景<select id="flowScenario"><option value="commute" selected>日常通勤</option><option value="lab">科研协作</option><option value="emergency">应急集合</option></select></label><label class="traffic-demand" for="flowDemand">需求强度 <b><span id="flowDemandValue">120</span><small> / min</small></b></label><input id="flowDemand" type="range" min="0" max="300" step="1" value="120" aria-label="假设人流需求，每分钟 0 至 300 人次"><div id="heatLegend" class="heat-legend">少 ───────── 多<br>人次每分钟 · 假设需求</div><div class="flow-metrics"><div><b id="flowCount">--</b><span>通行人次 / min</span></div><div><b id="flowPeak">--</b><span>峰值 / min</span></div><div><b id="flowConnections">--</b><span>可用连接</span></div><div><b id="flowDisconnected">--</b><span>未连通需求</span></div></div></aside>
 </section>
 <section id="floorPanel" class="inspection-stack dispatch-panel" aria-label="手动调度" hidden>
@@ -375,15 +382,12 @@ body{font-size:16px;font-family:'Lunaris Display','Microsoft YaHei','PingFang SC
  <div id="floorMaps" aria-label="楼层房间地图"></div>
  <div class="dispatch-legend"><span><i class="dispatch-room-dot"></i>房间</span><span><i class="dispatch-target-dot"></i>可达空位</span></div>
  <button id="manual" hidden aria-pressed="false">手动调度</button>
- <div id="manualControls" class="manual-controls" hidden><div class="six-axis" role="group" aria-label="立即移动房间">
- <button data-axis="0" data-sign="-1" title="向 X 负方向移动"><span>←</span>左移</button><button data-axis="2" data-sign="-1" title="向 Z 负方向移动"><span>↗</span>后移</button><button data-axis="1" data-sign="1" class="yaxis" title="经升降通道上升"><span>↑</span>升层</button>
- <button data-axis="0" data-sign="1" title="向 X 正方向移动"><span>→</span>右移</button><button data-axis="2" data-sign="1" title="向 Z 正方向移动"><span>↙</span>前移</button><button data-axis="1" data-sign="-1" class="yaxis" title="经升降通道下降"><span>↓</span>降层</button></div></div>
- <div id="manualHint" class="manual-hint" aria-live="polite">选择房间，再点黄色空位或方向即可搬运。</div>
+ <div id="manualHint" class="manual-hint" aria-live="polite">选择房间，再点黄色“＋”即可搬运。</div>
  <details class="room-details"><summary>房间详情</summary><div id="modelProfile" class="selected-info"></div><div id="roomScale" class="room-scale"><b>外 11.5 × 10.5 m</b><span>单层约 90 m² · 教室尺度</span></div><div id="hatchInfo" class="hatch-info"></div></details>
 </section>
 
 <label class="motion-toggle" for="motionHighlight"><span>搬运透视</span><input id="motionHighlight" type="checkbox" role="switch" checked><i aria-hidden="true"></i></label>
-<svg id="motionLeader" class="motion-leader" aria-hidden="true" hidden><path id="motionLeaderPath"/></svg><div id="motionBubble" class="motion-bubble" hidden><strong id="motionRoom"></strong><span id="motionStep"></span></div>
+<div id="motionLeader" class="motion-leader" aria-hidden="true" hidden><svg width="100%" height="100%"><path id="motionLeaderPath"/></svg></div><div id="motionBubble" class="motion-bubble" hidden><strong id="motionRoom"></strong><span id="motionStep"></span></div>
 
 <div class="coordinate mono"><span>X <b id="coordX">0.0</b></span><span class="y">Y <b id="coordY">3.4</b></span><span>Z <b id="coordZ">0.0</b></span><span>m</span></div>
 <aside id="flightTelemetry" class="flight-telemetry" aria-label="内部调度状态" hidden><b id="flightStage">准备搬运</b><b id="flightSpeed">0.0</b><b id="flightThrust">0.0</b><b id="dockStatus">已锁定</b></aside>
@@ -1898,9 +1902,9 @@ let flowData=null,flowKey='',flowClock=0,benchmark=null,lastRenderAt=0;
 let previewMove=null,walking=false,sectionMode=false,needsRender=true,rafPending=false,inFrame=false,lastNow=performance.now(),snapshotCache=null;
 let selectedRoom=1,visibleFloor=-1,manualMode=false,pendingManual=false,cutaway=false,viewName='overview',roaming=false,routeKey='',toastTimer;
 let yaw=.72,pitch=.2,distance=1230,target=new T.Vector3(-30,212,0),goal={yaw:.72,pitch:.2,distance:1230,target:new T.Vector3(-30,212,0)};
-const freePosition=new T.Vector3(),held=new Set();let freeYaw=0,freePitch=0;
+const freePosition=new T.Vector3(),held=new Set();let freeYaw=0,freePitch=0,roamSpeed=1;
 const mobile=()=>window.innerWidth<=760;
-let activePanel=null,naturalPlan=null,scheduling=false,railTimer=null,railPinned=false;
+let activePanel=null,chosenMission=null,naturalPlan=null,scheduling=false,railTimer=null,railPinned=false;
 const railZone='.sidebar,.side-panel,.view-cluster,.inspection-stack';
 function expandRail(open){document.body.classList.toggle('rail-open',open);$('railToggle').setAttribute('aria-expanded',String(open));$('railToggle').setAttribute('aria-label',railPinned?'收起左侧导航':open?'固定展开左侧导航':'展开左侧导航');}
 function scheduleRailClose(){clearTimeout(railTimer);railTimer=setTimeout(()=>{if(railPinned)return;const focused=document.activeElement;if(focused?.closest?.(railZone)&&(['INPUT','TEXTAREA','SELECT'].includes(focused.tagName)||focused.matches?.(':focus-visible')))return;showPanel(null);expandRail(false);},350);}
@@ -1912,7 +1916,7 @@ document.addEventListener('focusout',e=>{if(e.target.closest?.(railZone))schedul
 $('railToggle').onclick=()=>{railPinned=!railPinned;expandRail(railPinned);if(!railPinned){showPanel(null);$('railToggle').blur();}};
 const panelOpeners={missionPanel:'openMissions',schedulerPanel:'openScheduler',viewPanel:'openViews',floorPanel:'openFloors'};
 function showPanel(id,focus=false){
- const previous=activePanel;activePanel=id;held.clear();if(id){clearTimeout(railTimer);expandRail(true);if(previous!==id)$(id).scrollTop=0;}
+ const previous=activePanel;activePanel=id;if(previous==='floorPanel'&&id!=='floorPanel')exitManual();if(id!=='viewPanel')showOtherViews(false);held.clear();if(id){clearTimeout(railTimer);expandRail(true);if(previous!==id)$(id).scrollTop=0;}
  for(const [panel,opener] of Object.entries(panelOpeners)){
   $(panel).hidden=panel!==id;$(opener).classList.toggle('active',panel===id);$(opener).setAttribute('aria-expanded',String(panel===id));
  }
@@ -1920,6 +1924,13 @@ function showPanel(id,focus=false){
  else if(focus&&previous)$(panelOpeners[previous]).focus();
 }
 for(const [panel,opener] of Object.entries(panelOpeners))$(opener).onclick=()=>showPanel(activePanel===panel?null:panel);
+function showOtherViews(open){$('otherViewsMenu').hidden=!open;$('otherViewsToggle').setAttribute('aria-expanded',String(open));}
+$('otherViews').addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')showOtherViews(true);});
+$('otherViews').addEventListener('pointerleave',()=>{if(!$('otherViews').contains(document.activeElement))showOtherViews(false);});
+$('otherViews').addEventListener('focusout',e=>{if(!$('otherViews').contains(e.relatedTarget))showOtherViews(false);});
+$('otherViewsToggle').onclick=()=>showOtherViews($('otherViewsMenu').hidden);
+$('otherViewsToggle').addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();showOtherViews(true);$('closeup').focus();}});
+$('otherViews').addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('otherViewsMenu').hidden){e.preventDefault();e.stopPropagation();showOtherViews(false);$('otherViewsToggle').focus();}});
 document.querySelectorAll('[data-close-panel]').forEach(button=>button.onclick=()=>showPanel(null,true));
 document.addEventListener('click',event=>{if(activePanel&&!event.target.closest(railZone)&&event.target.tagName!=='CANVAS')showPanel(null);});
 const overviewDistance=()=>mobile()?1320:1230;
@@ -1939,7 +1950,7 @@ for(let level=0;level<C.config.layers;level++){
  const item=document.createElement('div');item.className='floor-item';item.dataset.level=level;floorItems.push(item);
  const button=document.createElement('button');button.className='floor-select';button.setAttribute('aria-label',`单独观察 L${level+1} 层`);button.setAttribute('aria-pressed','false');button.innerHTML=`<span>L${level+1}</span>`;button.onclick=()=>setFloor(visibleFloor===level?-1:level);item.appendChild(button);
  const grid=document.createElement('div');grid.className='floor-grid';grid.hidden=level!==mapFloor;item.appendChild(grid);
- C.nodes.forEach((node,i)=>{if(node.level!==level)return;const b=document.createElement('button');b.className='bay-dot'+(node.lift?' lift':'');b.style.gridColumn=String(node.col+3);b.style.gridRow=String(node.row+2);b.textContent=node.lift?node.shaft:'';b.dataset.node=i;b.onclick=()=>selectBay(i);grid.appendChild(b);mapButtons.push(b);});$('floorMaps').appendChild(item);
+ C.nodes.forEach((node,i)=>{if(node.level!==level)return;const b=document.createElement('button');b.className='bay-dot'+(node.lift?' lift':'');b.style.gridColumn=String(node.col+3);b.style.gridRow=String(node.row+2);b.textContent='＋';b.dataset.node=i;b.onclick=()=>selectBay(i);grid.appendChild(b);mapButtons.push(b);});$('floorMaps').appendChild(item);
 }
 function setMapFloor(level){mapFloor=level;floorItems.forEach(item=>{const active=Number(item.dataset.level)===level;item.classList.toggle('map-current',active);item.children[1].hidden=!active;});}
 function applyFloorSelection(level){visibleFloor=level;if(level>=0)setMapFloor(level);$('allFloors').classList.toggle('active',level<0);$('allFloors').setAttribute('aria-pressed',String(level<0));floorItems.forEach(item=>{const active=Number(item.dataset.level)===level;item.classList.toggle('selected',active);item.querySelector('button').setAttribute('aria-pressed',String(active));});}
@@ -1950,8 +1961,8 @@ function controls(){
  document.body.classList.toggle('manual-mode',manualMode||pendingManual);
  putText('play',!ready?'暂无可用计划':estop?'解除急停':playing?'Ⅱ 暂停演示':manualMode&&phases.length===0?'等待手动指令':time>=duration&&duration?'↺ 再次演示':time>0?'▶ 继续演示':'▶ 开始演示');
  $('play').disabled=!ready||(!phases.length&&!estop);$('timeline').disabled=!phases.length||estop;$('replay').disabled=!phases.length;$('export').disabled=!ready;
- $('manual').classList.toggle('active',manualMode);$('manual').setAttribute('aria-pressed',String(manualMode));$('manualControls').hidden=!manualMode;
- missionButtons.forEach(b=>{const active=b.dataset.task===task;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
+ $('manual').classList.toggle('active',manualMode);$('manual').setAttribute('aria-pressed',String(manualMode));
+ missionButtons.forEach(b=>{const active=b.dataset.task===task&&b.dataset.task===chosenMission;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
 }
 function updateViewButtons(){viewButtons.forEach(id=>{$(id).classList.toggle('active',id===viewName);$(id).setAttribute('aria-pressed',String(id===viewName));});}
 function chooseView(name){
@@ -1970,7 +1981,7 @@ for(const id of viewButtons)$(id).onclick=()=>chooseView(id);
 function showPlan(){
  $('timeline').max=duration||1;putText('total',String(moves.length));putText('distance',metres(moves.reduce((sum,m)=>sum+C.length(m.path),0))+' m');putText('verticalDistance',String(Math.round(moves.reduce((s,m)=>s+m.vertical,0)*C.config.metresPerUnit)));
  putText('planDistance',metres(moves.reduce((sum,m)=>sum+C.length(m.path),0)));
- $('log').innerHTML=moves.map(m=>`<li>${buildingNames[m.room]}<br>${C.nodes[m.from].label} → ${C.nodes[m.to].label}${m.vertical?' · 跨层':''}</li>`).join('')||'<li>选择建筑后，使用六向按钮或点击空闲泊位。</li>';
+ $('log').innerHTML=moves.map(m=>`<li>${buildingNames[m.room]}<br>${C.nodes[m.from].label} → ${C.nodes[m.to].label}${m.vertical?' · 跨层':''}</li>`).join('')||'<li>选择建筑后，使用房间与空闲泊位。</li>';
 }
 function compile(name,auto=true){
  naturalPlan=null;task=name;manualMode=false;pendingManual=false;estop=false;playing=false;time=0;baseLayout=C.initial.slice();baseElevators=C.config.baseY;previewMove=null;events=[];selectedRoom=C.missions[name].roomIds[0];
@@ -1978,7 +1989,7 @@ function compile(name,auto=true){
  catch(e){moves=[];phases=[];duration=0;ready=false;notify(e.message,true);}
  showPlan();setFloor(-1);chooseView('overview');controls();drawUI(snapshot());
 }
-missionButtons.forEach(b=>b.onclick=()=>compile(b.dataset.task,true));
+missionButtons.forEach(b=>b.onclick=()=>{chosenMission=b.dataset.task;compile(b.dataset.task,true);});
 function scheduleStamp(){return JSON.stringify({time,phases:phases.length,base:baseLayout,layout:snapshot().layout,blocked:blocked(),estop,task});}
 function computeNaturalPlan(text,layout,closed){
  const source=$('schedulerWorkerSource')?.textContent;
@@ -2013,6 +2024,7 @@ $('scheduleForm').onsubmit=async e=>{
  }catch(error){$('scheduleStatus').classList.add('bad');putText('scheduleStatus',error.message);}
  finally{scheduling=false;$('scheduleSubmit').disabled=false;requestRender();}
 };
+$('scheduleReset').onclick=()=>{$('scheduleInput').value='';$('scheduleInput').focus();};
 $('scheduleInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('scheduleForm').requestSubmit();}});
 $('motionHighlight').onchange=()=>requestRender();
 // One reusable edge geometry per room, drawn after opaque geometry with depth disabled.
@@ -2025,8 +2037,8 @@ function updateMotionOverlay(st){
  const inTransfer=st.phase&&time>0&&time<duration,completedTargets=naturalPlan&&time>=duration?naturalPlan.roomIds:[];
  const active=inTransfer?st.phase.room:-1;
  roomOutlines.forEach((outline,id)=>{outline.visible=completedTargets.includes(id)||$('motionHighlight').checked&&id===active;if(outline.visible){outline.position.copy(rooms[id].position);outline.rotation.copy(rooms[id].rotation);}});
- const bubble=$('motionBubble'),leader=$('motionLeader');bubble.hidden=leader.hidden=active<0;
- if(active<0)return;
+ const bubble=$('motionBubble'),leader=$('motionLeader');bubble.hidden=leader.hidden=active<0||!$('motionHighlight').checked;
+ if(bubble.hidden)return;
  const rect=stage.getBoundingClientRect(),anchor=rooms[active].position.clone().add(new T.Vector3(0,C.config.height+3,0));station.localToWorld(anchor);anchor.project(camera);
  if(anchor.z< -1||anchor.z>1){bubble.hidden=leader.hidden=true;return;}
  const x=rect.left+(anchor.x+1)*rect.width/2,y=rect.top+(1-anchor.y)*rect.height/2;
@@ -2049,11 +2061,14 @@ document.addEventListener('click',e=>{if(!e.target.closest('.speed-control'))clo
 $('play').onclick=()=>{if(!ready)return;if(estop){estop=false;notify('急停已解除。');}if(time>=duration)time=0;playing=!playing;if(playing&&(cutaway||viewName==='closeup'))chooseView('overview');audit(playing?'play':'pause');controls();};
 $('replay').onclick=()=>{time=0;playing=true;estop=false;pendingManual=false;if(cutaway||viewName==='closeup')chooseView('overview');audit('restart');controls();};
 $('timeline').oninput=e=>{if(estop)return;playing=false;pendingManual=false;const requested=Number(e.target.value);time=Math.abs(duration-requested)<.025?duration:Math.max(0,Math.min(duration,requested));audit('seek');controls();drawUI(snapshot());};
+function exitManual(){
+ manualMode=false;pendingManual=false;previewMove=null;chooseView('overview');controls();drawUI(snapshot());
+}
 function enterManual(){
  naturalPlan=null;const st=snapshot();baseLayout=st.layout.slice();baseElevators=structuredClone(st.elevators);moves=[];phases=[];duration=0;time=0;playing=false;manualMode=true;pendingManual=false;task='manual';previewMove=null;estop=false;ready=true;roaming=false;cutaway=false;if(viewName==='roam'||viewName==='mechanism')chooseView('overview');showPlan();controls();drawUI(snapshot());audit('manual-start',{layout:baseLayout.slice()});
 }
 $('manual').onclick=()=>{
- if(manualMode){manualMode=false;previewMove=null;controls();return;}
+ if(manualMode){exitManual();return;}
  if(estop){notify('请先解除急停，再开始手动调度。',true);return;}
  const st=snapshot();if(time>0&&time<duration&&st.phase){pendingManual=true;playing=true;cutaway=false;notify('当前建筑停靠后进入手动调度，保留已完成的布局。');controls();}else enterManual();
 };
@@ -2064,6 +2079,7 @@ function moveSelected(to){
   const transfer=C.move(layout,from,to,blocked());
   baseLayout=layout.slice();baseElevators=structuredClone(current.elevators);moves=[transfer];previewMove=null;
   const tl=C.timeline(moves,32,baseElevators);phases=tl.phases;duration=tl.duration;time=0;ready=true;
+  if(activePanel==='floorPanel'){railPinned=true;clearTimeout(railTimer);expandRail(true);}
   chooseView('overview');playing=true;showPlan();audit('manual-transfer',{room:selectedRoom,path:transfer.path});controls();drawUI(snapshot());
  }catch(e){notify(e.message,true);requestRender();}
 }
@@ -2103,7 +2119,7 @@ renderer.domElement.addEventListener('pointermove',e=>{
  if(!roaming)syncInput();else requestRender();
 });
 for(const event of ['pointerup','pointercancel'])renderer.domElement.addEventListener(event,e=>{if(event==='pointerup'&&drag&&!drag.moved&&e.button!==2&&!roaming)pick(e.clientX,e.clientY);pointers.delete(e.pointerId);pinch=0;pinchCenter=null;drag=null;});
-renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();if(roaming){const forward=new T.Vector3(Math.sin(freeYaw)*Math.cos(freePitch),Math.sin(freePitch),Math.cos(freeYaw)*Math.cos(freePitch));freePosition.addScaledVector(forward,-e.deltaY*.15);}else goal.distance=Math.max(110,Math.min(3100,goal.distance*Math.exp(e.deltaY*.00085)));if(!roaming)syncInput();requestRender();},{passive:false});
+renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();if(roaming){const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?window.innerHeight:1);roamSpeed=Math.max(.1,Math.min(8,roamSpeed*Math.exp(-Math.max(-600,Math.min(600,delta))*.002)));notify(`漫游速度 · ${roamSpeed.toFixed(1)}×`);}else goal.distance=Math.max(110,Math.min(3100,goal.distance*Math.exp(e.deltaY*.00085)));if(!roaming)syncInput();requestRender();},{passive:false});
 let focusBefore=null;function openSettings(){held.clear();showPanel(null);focusBefore=document.activeElement;$('settings').hidden=false;$('closeSettings').focus();}function closeSettings(){$('settings').hidden=true;focusBefore?.focus();}
 $('openSettings').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('settings').onclick=e=>{if(e.target===$('settings'))closeSettings();};
 $('stop').onclick=()=>{playing=false;estop=true;pendingManual=false;audit('emergency-stop');controls();closeSettings();notify('已急停。所有建筑保持当前位置，点击“解除急停”继续。',true);};
@@ -2140,9 +2156,9 @@ function drawUI(st){
  const location=st.active===selectedRoom&&['translate','elevate'].includes(st.type)?'运输中':C.nodes[arriving?st.phase.to:node]?.label||'运输中';
  putText('selectedInfo',location);
  putText('coordX',metres(p[0]));putText('coordY',metres(p[1]));putText('coordZ',metres(p[2]));
- putText('phase',estop?'已急停':cutaway?'精简框架 · 演示已暂停':!ready?'当前布局暂无有效路径':manualMode&&!phases.length?'手动调度 · 请选择方向':`${taskNames[task]} · ${naturalPlan&&!moves.length?'目标已满足':time===0?'已就绪':phaseNames[st.type]}`);
+ putText('phase',estop?'已急停':cutaway?'精简框架 · 演示已暂停':!ready?'当前布局暂无有效路径':manualMode&&!phases.length?'手动调度 · 请选择泊位':`${taskNames[task]} · ${naturalPlan&&!moves.length?'目标已满足':time===0?'已就绪':phaseNames[st.type]}`);
  putText('time',`${fmt(time)} / ${fmt(duration)}`);$('timeline').value=String(time);putText('completed',String(st.finished));
- putText('detail',cutaway?'隐藏舱体，观察融入楼板与接缝的承重梁、导轨和内部升降机构。':estop?'建筑保持当前状态，解除急停后继续。':pendingManual?'正在完成当前搬运，停靠后进入手动调度。':time===0?'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。':st.phase?`${st.active>=0?buildingNames[st.active]:'对接机构'} · ${C.nodes[st.phase.from].label} → ${C.nodes[st.phase.to].label} · ${phaseNames[st.type]}${st.type==='elevate'?' · Y = '+metres(st.head[1])+' m':''}`:st.type==='done'?'任务完成。可切换楼层观察布局，或开启手动六向调度。':'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。');
+ putText('detail',cutaway?'隐藏舱体，观察融入楼板与接缝的承重梁、导轨和内部升降机构。':estop?'建筑保持当前状态，解除急停后继续。':pendingManual?'正在完成当前搬运，停靠后进入手动调度。':time===0?'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。':st.phase?`${st.active>=0?buildingNames[st.active]:'对接机构'} · ${C.nodes[st.phase.from].label} → ${C.nodes[st.phase.to].label} · ${phaseNames[st.type]}${st.type==='elevate'?' · Y = '+metres(st.head[1])+' m':''}`:st.type==='done'?'任务完成。可切换楼层观察布局，或开启手动调度。':'房间沿集成于楼板的导轨平移，经内部升降通道跨层，落座后完成对接锁定。');
  $('flightTelemetry').hidden=true;
  const busy=phases.length>0&&time<duration;
  const targetKey=st.layout.join(',')+'|'+selectedRoom+'|'+manualMode+'|'+busy+'|'+estop+'|'+blocked().join(',');
@@ -2152,12 +2168,12 @@ function drawUI(st){
   if(mapStates[index]===key)continue;mapStates[index]=key;
   b.classList.toggle('empty',room===null);b.classList.toggle('chosen',room===selectedRoom);b.classList.toggle('active',movingHere);b.classList.toggle('reachable',reachable);
   b.disabled=room===null&&!reachable;b.style.setProperty('--room-color',room===null?'#607f98':roomPalette[roomTypes[room]].color);b.dataset.room=room===null?'':String(room);
-  b.textContent=room===null?(C.nodes[index].shaft||'＋'):String(room+1).padStart(2,'0');
+  b.textContent=room===null?'＋':String(room+1).padStart(2,'0');
   b.setAttribute('aria-label',`${C.nodes[index].label}：${room===null?(reachable?'可达空位，点击搬运':'不可达空位'):buildingNames[room]}`);b.title=`${C.nodes[index].label} · ${room===null?(reachable?'点击立即搬运':'当前不可达'):buildingNames[room]}`;
  }
  putText('manualState',estop?'已急停':pendingManual?'等待停靠':manualMode&&busy?'搬运中':'已选中');
  axisButtons.forEach(b=>{const to=C.neighbor(node,Number(b.dataset.axis),Number(b.dataset.sign)),available=to!==undefined&&C.edgeClear(node,to,st.layout,selectedRoom,blocked());b.disabled=Boolean(estop||busy||!available);});
- putText('manualHint',estop?'已急停，请先恢复播放。':pendingManual?'当前房间停靠后切换手动调度。':manualMode&&busy?'搬运中 · 停靠后可继续操作。':'选房间，再点黄色空位或方向即可搬运。');
+ putText('manualHint',estop?'已急停，请先恢复播放。':pendingManual?'当前房间停靠后切换手动调度。':manualMode&&busy?'搬运中 · 停靠后可继续操作。':'选房间，再点黄色“＋”即可搬运。');
 }
 function updateRoute(st){
  const current=previewMove||(st.phase?moves[st.phase.moveIndex]:null),key=current?current.room+'|'+current.from+'|'+current.to+'|'+(previewMove?'preview':'flight'):'';
@@ -2185,7 +2201,7 @@ function draw(dt,now,force=false){
  updateRoute(st);
  if(viewName==='closeup'&&!roaming){const p=st.positions[selectedRoom];goal.target.set(p[0],p[1]+35,p[2]);}
  else if($('follow').checked&&playing&&st.active>=0&&!roaming){goal.target.set(st.head[0],st.head[1]+35,st.head[2]);}
- if(roaming){const forward=new T.Vector3(Math.sin(freeYaw),0,Math.cos(freeYaw)),right=new T.Vector3(-Math.cos(freeYaw),0,Math.sin(freeYaw)),speed=dt*(held.has('ShiftLeft')||held.has('ShiftRight')?230:75);if(held.has('KeyW'))freePosition.addScaledVector(forward,speed);if(held.has('KeyS'))freePosition.addScaledVector(forward,-speed);if(held.has('KeyD'))freePosition.addScaledVector(right,speed);if(held.has('KeyA'))freePosition.addScaledVector(right,-speed);if(held.has('KeyE'))freePosition.y+=speed;if(held.has('KeyQ'))freePosition.y-=speed;freePosition.y=Math.max(terrainY(freePosition.x,freePosition.z)+7,Math.min(2500,freePosition.y));freePosition.x=Math.max(-3500,Math.min(3500,freePosition.x));freePosition.z=Math.max(-3500,Math.min(3500,freePosition.z));camera.position.copy(freePosition);camera.lookAt(freePosition.x+Math.sin(freeYaw)*Math.cos(freePitch),freePosition.y+Math.sin(freePitch),freePosition.z+Math.cos(freeYaw)*Math.cos(freePitch));}
+ if(roaming){const forward=new T.Vector3(Math.sin(freeYaw),0,Math.cos(freeYaw)),right=new T.Vector3(-Math.cos(freeYaw),0,Math.sin(freeYaw)),speed=dt*roamSpeed*(held.has('ShiftLeft')||held.has('ShiftRight')?230:75);if(held.has('KeyW'))freePosition.addScaledVector(forward,speed);if(held.has('KeyS'))freePosition.addScaledVector(forward,-speed);if(held.has('KeyD'))freePosition.addScaledVector(right,speed);if(held.has('KeyA'))freePosition.addScaledVector(right,-speed);if(held.has('KeyE'))freePosition.y+=speed;if(held.has('KeyQ'))freePosition.y-=speed;freePosition.y=Math.max(terrainY(freePosition.x,freePosition.z)+7,Math.min(2500,freePosition.y));freePosition.x=Math.max(-3500,Math.min(3500,freePosition.x));freePosition.z=Math.max(-3500,Math.min(3500,freePosition.z));camera.position.copy(freePosition);camera.lookAt(freePosition.x+Math.sin(freeYaw)*Math.cos(freePitch),freePosition.y+Math.sin(freePitch),freePosition.z+Math.cos(freeYaw)*Math.cos(freePitch));}
  else{const ease=reducedMotion?1:1-Math.exp(-dt*8);yaw+=(goal.yaw-yaw)*ease;pitch+=(goal.pitch-pitch)*ease;distance+=(goal.distance-distance)*ease;target.lerp(goal.target,ease);const dist=distance*Math.max(1,.9/camera.aspect);camera.position.set(target.x+Math.sin(yaw)*Math.cos(pitch)*dist,target.y+Math.sin(pitch)*dist,target.z+Math.cos(yaw)*Math.cos(pitch)*dist);camera.lookAt(target);if(Math.abs(goal.yaw-yaw)<.00001&&Math.abs(goal.pitch-pitch)<.00001&&Math.abs(goal.distance-distance)<.02&&target.distanceTo(goal.target)<.02){yaw=goal.yaw;pitch=goal.pitch;distance=goal.distance;target.copy(goal.target);}}
  camera.updateMatrixWorld();updateMotionOverlay(st);const labelRoom=st.active>=0&&time>0?st.active:selectedRoom,r=rooms[labelRoom],v=r.position.clone().add(new T.Vector3(0,85,0)).project(camera),w=stage.clientWidth,h=stage.clientHeight,sx=(v.x+1)*w/2,sy=(1-v.y)*h/2;
  activeLabel.hidden=!$('labels').checked||!r.userData.visible||v.z>1||v.z< -1||sx<60||sx>w-60||sy<70||sy>h-20;const labelText=`${buildingNames[labelRoom]}${st.type==='elevate'?'  ↑↓ Y '+metres(st.head[1])+' m':''}`;if(activeLabel.textContent!==labelText)activeLabel.textContent=labelText;if(!activeLabel.hidden){activeLabel.style.transform=`translate3d(${sx}px,${sy}px,0) translate(-50%,-100%)`;activeLabel.style.left='0';activeLabel.style.top='0';}

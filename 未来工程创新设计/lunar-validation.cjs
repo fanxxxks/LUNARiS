@@ -108,7 +108,7 @@ async function main() {
 
   await test('Selecting an empty destination immediately starts a collision-checked cross-level transfer', () => {
     reset(); $('manual').click(); tick();
-    assert.equal($('manualControls').hidden, false); assert.equal(read().manualMode, true);
+    assert.equal(read().manualMode, true);
     const from=C.bay(0,-1,-1),to=C.bay(1,1,-1),id=read().state.layout[from];
     assert.notEqual(id,null);assert.equal(read().state.layout[to],null);map(from).click();tick();
     map(to).click();tick();assert.equal(read().previewMove,null);assert.equal(read().playing,true);assert.equal(read().moves[0].to,to);
