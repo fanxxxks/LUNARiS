@@ -1,0 +1,11 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const read=name=>fs.readFileSync(path.join(__dirname,name),'utf8');
+const scripts=[read('vendor/three.min.js'),read('simulation-core.js'),read('lunar-scene.js')+'\n'+read('lunar-modules.js')+'\n'+read('lunar-connectivity.js')+'\n'+read('lunar-renderer.js')+'\n'+read('lunar-app.js')];
+scripts.forEach((script,i)=>new vm.Script(script,{filename:`bundle-${i}.js`}));
+const fontFaces=[['Lunaris Sans','lunaris-sans.woff2','100 900','NotoSansSC-OFL.txt'],['Lunaris Display','lunaris-display.woff2','300 700','SpaceGrotesk-OFL.txt']];
+const fontCSS=fontFaces.map(([family,file,weight,license])=>`/* ${read('vendor/fonts/'+license).replace(/\*\//g,'* /')} */\n@font-face{font-family:'${family}';src:url(data:font/woff2;base64,${fs.readFileSync(path.join(__dirname,'vendor/fonts',file)).toString('base64')}) format('woff2');font-weight:${weight};font-style:normal;font-display:swap;}`).join('\n');
+const template=read('lunar-ui.html');
+if(!template.includes('<!-- FONTS -->')||!template.includes('<!-- SCRIPTS -->'))throw new Error('UI template is missing its font or script build marker.');
+const html=template.replace('<!-- FONTS -->',()=>fontCSS).replace('<!-- SCRIPTS -->',()=>scripts.map(s=>'<script>'+s.replace(/<\/script/gi,'<\\/script')+'</script>').join('\n'));
+fs.writeFileSync(path.join(__dirname,'月宫华容_三维仿真软件.html'),html);
+console.log(`Built LUNARIS 7: ${(Buffer.byteLength(html)/1024).toFixed(0)} KB, offline, 24 compact modules / 42 nodes / 5 stepped levels / six-face connections / traffic heatmap / MSAA.`);

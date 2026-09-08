@@ -1,0 +1,33 @@
+const flightVisual=new T.Group();station.add(flightVisual);flightVisual.visible=false;
+const flameMaterial=new T.ShaderMaterial({transparent:true,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending,toneMapped:false,uniforms:{power:{value:.5},time:{value:0}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;uniform float power;uniform float time;void main(){float edge=pow(sin(vUv.x*3.14159),1.4);float shape=pow(vUv.y,.4)*(1.-smoothstep(.8,1.,vUv.y));float pulse=.87+.13*sin(vUv.y*35.-time*25.);vec3 c=mix(vec3(.08,.35,.72),vec3(.65,.93,1.35),pow(vUv.y,1.4));gl_FragColor=vec4(c*1.6,edge*shape*pulse*power*.65);}'});
+const flames=[];for(const x of [-35,35])for(const z of [-29,29]){const f=mesh(flightVisual,new T.ConeGeometry(5,22,16,1,true),flameMaterial,x,-11,z);f.castShadow=false;flames.push(f);}
+const rcsMaterial=new T.MeshBasicMaterial({color:'#a4deff',transparent:true,opacity:.4,blending:T.AdditiveBlending,depthWrite:false});const rcs=[];
+for(const side of [-1,1]){const f=mesh(flightVisual,new T.ConeGeometry(2,15,12,1,true),rcsMaterial,side*52,20,-25);f.rotation.z=side*Math.PI/2;f.castShadow=false;rcs.push(f);}
+const dustCount=160,dustGeometry=new T.BufferGeometry(),dustData=new Float32Array(dustCount*3);for(let i=0;i<dustCount;i++){dustData[i*3]=rand()*Math.PI*2;dustData[i*3+1]=rand();dustData[i*3+2]=rand();}dustGeometry.setAttribute('position',new T.BufferAttribute(dustData,3));
+const dustMaterial=new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{time:{value:0},power:{value:0}},vertexShader:'uniform float time;uniform float power;varying float alpha;void main(){float age=fract(position.y+time*.65);float r=age*(26.+position.z*32.);vec3 p=vec3(sin(position.x)*r,max(0.,age*14.-age*age*14.),cos(position.x)*r);alpha=(1.-age)*power*.45;vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(1300./-mv.z,1.,2.5);}',fragmentShader:'varying float alpha;void main(){gl_FragColor=vec4(.64,.67,.7,alpha);}'});const dust=new T.Points(dustGeometry,dustMaterial);station.add(dust);dust.visible=false;
+const ghostMaterial=new T.MeshBasicMaterial({color:'#97efd1',transparent:true,opacity:.15,depthWrite:false,wireframe:true});const previewGhost=mesh(station,new T.BoxGeometry(C.config.width,C.config.height,C.config.depth),ghostMaterial);previewGhost.visible=false;previewGhost.castShadow=false;
+let walkGroup=new T.Group();station.add(walkGroup);let walkLineKey='';
+function drawWalkPath(routes,key){if(walkLineKey===key)return;walkLineKey=key;walkGroup.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});station.remove(walkGroup);walkGroup=new T.Group();station.add(walkGroup);for(const route of routes||[]){if(route.points?.length>1){const pts=route.points.map(p=>[p[0],p[1]+3,p[2]]);const l=line(walkGroup,pts,'#99e4b4',.95);l.material.depthTest=false;l.renderOrder=9;}}}
+const captureVisual=new T.Group();station.add(captureVisual);captureVisual.visible=false;
+const captureRing=ring(captureVisual,13.5,.8,0,26,-44,mats.cool);const captureArms=[];for(const a of [0,Math.PI/2,Math.PI,Math.PI*1.5]){const arm=box(captureVisual,3,5,4,Math.cos(a)*16,26+Math.sin(a)*16,-42,mats.gold);arm.userData.angle=a;captureArms.push(arm);}
+function updateFlightVisual(st,t){
+ const flying=['depart','cruise','approach'].includes(st.type),id=st.active,p=id>=0?st.positions[id]:null;
+ flightVisual.visible=Boolean(p&&flying);dust.visible=Boolean(p&&flying&&p[1]<80);
+ if(p&&flying){flightVisual.position.fromArray(p);flightVisual.rotation.set(...st.orientations[id],'YXZ');const throttle=st.throttle||.4;flameMaterial.uniforms.power.value=throttle;flameMaterial.uniforms.time.value=t;
+  for(const f of flames){const scale=.5+throttle*.8;f.scale.y=scale;f.position.y=-11*scale;}const accel=st.acceleration||[0,0,0];rcs.forEach((f,i)=>f.visible=Math.abs(accel[0])+Math.abs(accel[2])>.2&&(i===0?accel[0]>0:accel[0]<0));
+  if(dust.visible){dust.position.set(p[0],13.5,p[2]);dustMaterial.uniforms.time.value=t;dustMaterial.uniforms.power.value=Math.max(0,1-(p[1]-34)/46)*throttle;}
+ }
+ const capture=p&&['softCapture','hardCapture','leakTest','equalize','connect','open','dock'].includes(st.type);captureVisual.visible=Boolean(capture);
+ if(capture){const n=C.nodes[st.phase.to];captureVisual.position.fromArray(C.slots[n.id]);captureVisual.rotation.y=n.yaw;const close=st.connectionProgress??0;captureArms.forEach(a=>{a.position.x=Math.cos(a.userData.angle)*(16-close*3);a.position.y=26+Math.sin(a.userData.angle)*(16-close*3);});}
+}
+let lastFloor=null,lastFrameOnly=null,lastSection=null;const instanceState=rooms.map(()=>null);
+function updateInstances(positions,visibleFloor,frameOnly,orientations=null,sectionRoom=-1){
+ const filterChanged=visibleFloor!==lastFloor||frameOnly!==lastFrameOnly||sectionRoom!==lastSection,changed=new Set();
+ rooms.forEach((room,i)=>{const p=positions[i],o=orientations?.[i]||[0,C.nodes[C.initial.indexOf(i)].yaw,0],visible=(visibleFloor<0||Math.abs((p[1]-C.config.baseY)/C.config.pitchY-visibleFloor)<.52)&&!frameOnly;
+  const prev=instanceState[i];if(filterChanged||!prev||p.some((v,k)=>v!==prev[k])||o.some((v,k)=>v!==prev[k+3])){room.position.fromArray(p);room.rotation.set(...o,'YXZ');room.userData.visible=visible;instanceState[i]=[...p,...o];changed.add(i);}
+ });
+ if(!changed.size)return false;
+ for(const batch of moduleBatches){let touched=false;batch.mesh.instanceMatrix.clearUpdateRanges?.();batch.ids.forEach((id,j)=>{if(!changed.has(id))return;const room=rooms[id],show=room.userData.visible&&!(batch.layer==='skin'&&id===sectionRoom);dummy.position.copy(room.position);dummy.rotation.copy(room.rotation);dummy.scale.setScalar(show?1:0);dummy.updateMatrix();batch.mesh.setMatrixAt(j,dummy.matrix);batch.mesh.instanceMatrix.addUpdateRange?.(j*16,16);touched=true;});if(touched)batch.mesh.instanceMatrix.needsUpdate=true;}
+ if(filterChanged){frameLevels.forEach((g,i)=>g.visible=visibleFloor<0||i===visibleFloor);posts.visible=visibleFloor<0;foundations.visible=visibleFloor<0||visibleFloor===0;portIndicators.forEach((g,i)=>g.visible=visibleFloor<0||C.nodes[i].level===visibleFloor);}
+ lastFloor=visibleFloor;lastFrameOnly=frameOnly;lastSection=sectionRoom;renderer.shadowMap.needsUpdate=true;return true;
+}

@@ -1,0 +1,24 @@
+{
+  "scope": "Actual fixed mother-port/bridge/braces/roof/infrastructure/terrain/rocks. 150 exact straight swept room envelopes including soft capture; conservative continuous annulus covers all external turns and vertical transfers. No CFD/load-bearing claim.",
+  "moduleBounds": [
+    {
+      "min": [
+        -46,
+        0.30000001192092896,
+        -42
+      ],
+      "max": [
+        46,
+        76.5,
+        42
+      ]
+    }
+  ],
+  "totalStaticTriangles": 478616,
+  "indexedStaticTriangles": 260872,
+  "translationSweeps": 150,
+  "potentialTranslationConflicts": 0,
+  "potentialAnnularTriangles": 0,
+  "hits": [],
+  "annulusExamples": []
+}

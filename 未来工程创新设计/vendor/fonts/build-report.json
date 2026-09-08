@@ -1,0 +1,31 @@
+{
+  "sources": {
+    "SourceHanSerifSC-Bold": {
+      "sha256": "706b8c0de2deff6cbc0c87e2cdedfd33a78b7ffd76cebb4549012f197ba611fe",
+      "family": "Lunaris Serif",
+      "output": "lunaris-serif-bold.woff2",
+      "bytes": 298984,
+      "glyphCodepoints": 639,
+      "missingCjk": []
+    },
+    "SpaceGrotesk": {
+      "sha256": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72",
+      "family": "Lunaris Display",
+      "output": "lunaris-display.woff2",
+      "bytes": 33100,
+      "glyphCodepoints": 426,
+      "missingCjk": []
+    }
+  },
+  "textFiles": [
+    "lunar-ui.html",
+    "simulation-core.js",
+    "lunar-app.js",
+    "lunar-connectivity.js",
+    "lunar-model-profiles.js",
+    "lunar-modules.js",
+    "lunar-renderer.js",
+    "lunar-scene.js"
+  ],
+  "characters": 642
+}
