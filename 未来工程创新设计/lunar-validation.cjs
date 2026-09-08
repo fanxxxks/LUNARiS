@@ -106,38 +106,36 @@ async function main() {
     assert.equal(read().playing,false);assert.equal(read().state.type,'done');assert.match($('phase').textContent,/重构完成/);assert.equal($('completed').textContent,$('total').textContent);$('speed').value='4';
   });
 
-  await test('Manual movement previews first, cancels without moving, then confirms a full internal cross-level transfer', () => {
+  await test('Selecting an empty destination immediately starts a collision-checked cross-level transfer', () => {
     reset(); $('manual').click(); tick();
     assert.equal($('manualControls').hidden, false); assert.equal(read().manualMode, true);
     const from=C.bay(0,-1,-1),to=C.bay(1,1,-1),id=read().state.layout[from];
     assert.notEqual(id,null);assert.equal(read().state.layout[to],null);map(from).click();tick();
-    const before=plain(read().state.layout);map(to).click();tick();assert.equal($('movePreview').hidden,false);
-    assert.equal(read().previewMove.to,to);assert.equal(read().playing,false);assert.deepEqual(plain(read().state.layout),before);
-    $('cancelMove').click();tick();assert.equal(read().previewMove,null);assert.deepEqual(plain(read().state.layout),before);
-    map(to).click();tick();$('confirmMove').click();tick();assert.equal(read().playing,true);
+    map(to).click();tick();assert.equal(read().previewMove,null);assert.equal(read().playing,true);assert.equal(read().moves[0].to,to);
     const vertical=read().phases.find(p=>p.type==='elevate');seek(vertical.start+(vertical.end-vertical.start)*.4);
     const st=read().state;assert.equal(st.active,id);assert.ok(st.positions[id][1]>34&&st.positions[id][1]<126);assert.equal($('flightTelemetry').hidden,true);
     for(const [index,room] of context.__performanceProbe.rooms().entries()){room.position.toArray().forEach((v,a)=>h.close(v,st.positions[index][a],'Rendered XYZ position'));assert.equal(room.rotation.order,'YXZ');}
     end();assert.equal(read().state.layout[to],id);assert.equal($('coordY').textContent,'12.6');
-    document.activeElement=document.body;dispatch(document,'keydown',{code:'KeyA',key:'a'});tick();assert.equal(read().previewMove.to,C.lift(1,'C'));$('confirmMove').click();tick();end();
-    dispatch(document,'keydown',{code:'KeyQ',key:'q'});tick();assert.equal(read().previewMove.to,C.lift(0,'C'));$('confirmMove').click();tick();end();assert.equal($('coordY').textContent,'3.4');
+    document.activeElement=document.body;dispatch(document,'keydown',{code:'KeyA',key:'a'});tick();assert.equal(read().moves[0].to,C.lift(1,'C'));assert.equal(read().playing,true);end();
+    dispatch(document,'keydown',{code:'KeyQ',key:'q'});tick();assert.equal(read().moves[0].to,C.lift(0,'C'));assert.equal(read().playing,true);end();assert.equal($('coordY').textContent,'3.4');
   });
 
-  await test('Selecting another room clears a stale manual preview', () => {
-    reset(); $('manual').click(); tick(); map(C.bay(0,-1,-1)).click(); map(C.bay(1,1,-1)).click(); tick();
-    assert.ok(read().previewMove); map(C.bay(0,-2,-1)).click(); tick();
-    assert.equal(read().previewMove, null); assert.equal($('movePreview').hidden, true);
+  await test('Selecting another room during movement does not replace the active transfer', () => {
+    reset();$('manual').click();tick();map(C.bay(0,-1,-1)).click();map(C.bay(1,1,-1)).click();tick();
+    const move=read().moves[0];map(C.bay(0,-2,-1)).click();tick();
+    assert.strictEqual(read().moves[0],move);assert.equal(read().playing,true);assert.ok(maps().filter(b=>b.dataset.room==='').every(b=>b.disabled));end();
   });
 
-  await test('Changing access or exiting manual mode invalidates the unconfirmed route',()=>{
-    reset();$('manual').click();tick();map(C.bay(0,-1,-1)).click();map(C.bay(1,1,-1)).click();tick();assert.ok(read().previewMove);
-    $('block').checked=true;$('block').onchange();tick();assert.equal(read().previewMove,null);$('confirmMove').click();tick();assert.equal(read().playing,false);
-    $('block').checked=false;$('block').onchange();map(C.bay(1,1,-1)).click();tick();assert.ok(read().previewMove);$('manual').click();tick();assert.equal(read().previewMove,null);assert.equal($('movePreview').hidden,true);
+  await test('Blocked destinations and emergency stop refuse new immediate transfers',()=>{
+    reset();$('manual').click();tick();map(C.bay(0,-1,-1)).click();$('block').checked=true;$('block').onchange();tick();
+    assert.equal(map(C.lift(1,'C')).disabled,true);map(C.lift(1,'C')).click();tick();assert.equal(read().moves.length,0);
+    $('block').checked=false;$('block').onchange();tick();map(C.bay(1,1,-1)).click();tick();assert.equal(read().playing,true);
+    const move=read().moves[0];$('stop').click();tick();map(C.bay(0,0,1)).click();assert.strictEqual(read().moves[0],move);assert.equal(read().playing,false);reset();
   });
 
   await test('Five-layer isolation and integrated framework view retain original coordinates', () => {
     reset(); const original = plain(read().state.positions);
-    $('floorMaps').children[0].querySelector('button').click(); tick(); settle();
+    $('floorMaps').children[4].querySelector('button').click(); tick(); settle();
     assert.equal(read().visibleFloor, 4); assert.equal($('allFloors').attrs['aria-pressed'], 'false');
     const visible = context.__performanceProbe.rooms().filter(r => r.userData.visible);
     assert.equal(visible.length, C.initial.filter((id,node) => id !== null && C.nodes[node].level === 4).length);
@@ -216,7 +214,7 @@ async function main() {
 
   await test('Closing L2 C reroutes presets, refuses a blocked manual target, and reopens cleanly',()=>{
     $('block').checked=true;missions[0].click();tick();assert.equal($('play').disabled,false);assert.ok(read().moves.every(m=>!m.nodePath.includes(C.lift(1,'C'))));end();assert.equal(C.missionMetric('vertical',read().state.layout),3);
-    reset();$('manual').click();tick();map(C.bay(0,-1,-1)).click();$('block').checked=true;$('block').onchange();map(C.lift(1,'C')).click();tick();assert.equal(read().previewMove,null);assert.equal($('movePreview').hidden,true);reset();
+    reset();$('manual').click();tick();map(C.bay(0,-1,-1)).click();$('block').checked=true;$('block').onchange();map(C.lift(1,'C')).click();tick();assert.equal(read().previewMove,null);assert.equal(read().moves.length,0);reset();
   });
 
   await test('V7 export contains lift states, reconstructible phases, assumed traffic, and active rendering settings', async () => {
