@@ -1,0 +1,29 @@
+{
+  "generator": "built-in image_gen.imagegen",
+  "generatedDate": "2026-09-08",
+  "referenceImage": "C:/Users/frank/AppData/Local/Temp/codex-clipboard-b90916e7-148b-4dd5-bb44-d53336e8eb00.png",
+  "referenceRole": "photographic industrial aerospace surface style only; distinct new texture assets",
+  "assets": [
+    {
+      "slug": "woven-fabric",
+      "sourceGeneratedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08023-73d3-7153-8ae2-b42ed8a8ae0b\\exec-86c259f4-a878-4b2f-b25e-b14851ea51fe.png",
+      "workspacePath": "D:/future-engineer-designment/LUNARiS/未来工程创新设计/assets/textures/source/woven-fabric.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: square seamless PBR base-color texture for high fidelity lunar habitat bedding and upholstered cushions. Generate a single approximately 2048 x 2048 square orthographic overhead photographic material scan, filling every pixel with one flat continuous dense woven textile surface, very fine high thread count cotton-linen aerospace upholstery, neutral off-white pale gray fibers, tight tiny regular warp and weft with subtle natural yarn irregularity and individual hairlike fibers. Quality and tactile realism must match close-up industrial space habitat documentary photography. Natural microfiber detail, realistic fine scale, not coarse burlap, not rope, not knitted. Cross-polarized evenly diffuse de-lit capture: no lighting gradient, no directional shadows, no specular highlights, no ambient shadows. Base color only. Edge-to-edge tileable with uniform texture density. Flat and taut with NO wrinkles, no seams, no stitching, no borders, no buttons, no text, no objects, no material sphere, no perspective, no vignette, no CGI appearance.",
+      "inspection": "Visually inspected: orthographic uniform edge-to-edge material texture; no text, objects, seams or gradients."
+    },
+    {
+      "slug": "molded-rubber",
+      "sourceGeneratedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08023-73d3-7153-8ae2-b42ed8a8ae0b\\exec-58137a9e-dc61-48db-b6d1-a9edb9f9a591.png",
+      "workspacePath": "D:/future-engineer-designment/LUNARiS/未来工程创新设计/assets/textures/source/molded-rubber.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: square seamless PBR base-color texture for highly realistic lunar habitat non-slip rubber equipment surfaces, seals and flooring. Generate a single approximately 2048 x 2048 square orthographic overhead photographic material scan, filling every pixel with one flat continuous molded EPDM / silicone rubber surface in neutral dark charcoal gray, softly granular microporous pressure-molded finish, very fine natural random grains and restrained fine worn scuff marks, clean maintained industrial material. The tactile microstructure should feel real at close photographic inspection. No macro pattern, no checkerboard, no raised grid, no stamped logos. Cross-polarized diffuse de-lit evenly illuminated capture, with no directional lighting, no shadows, no highlight, no dark corners or light gradient. Base color only, dark enough for charcoal rubber but visible fine microdetails. Edge-to-edge seamless tile, uniform texture density, no border, no text, no objects, no material sphere, no perspective, no vignette, no CG render.",
+      "inspection": "Visually inspected: orthographic uniform edge-to-edge material texture; no text, objects, seams or gradients."
+    },
+    {
+      "slug": "ceramic-polymer",
+      "sourceGeneratedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08023-73d3-7153-8ae2-b42ed8a8ae0b\\exec-e6d7555b-a537-4fcb-81da-fa368c2b32ce.png",
+      "workspacePath": "D:/future-engineer-designment/LUNARiS/未来工程创新设计/assets/textures/source/ceramic-polymer.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: square seamless PBR base-color texture for highly realistic clean medical and aerospace interior engineering polymer / ceramic coated surfaces. Generate a single approximately 2048 x 2048 square orthographic overhead photographic material scan, filling every pixel with a flat continuous pale light neutral gray-white engineering ceramic polymer coating. Fine clean satin matte micrograin, subtly visible tiny molded stipple, extremely faint sparse hairline handling scratches, refined well-maintained technical finish. Actual industrial macro photography quality with believable subtle microstructure, not an illustration and not noise overlay. Cross-polarized evenly diffuse de-lit capture, completely uniform overall brightness, no reflections, no highlights, no cast shadows or directional shading. Base-color texture for real-time PBR shading. Edge-to-edge seamless tile, uniform density and color. No coarse concrete pores, no stone veining, no dirt patches, no yellow discoloration, no panels, no seams, no bolts, no text, no borders, no objects, no material sphere, no perspective, no vignette.",
+      "inspection": "Visually inspected: orthographic uniform edge-to-edge material texture; no text, objects, seams or gradients."
+    }
+  ]
+}

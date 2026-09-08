@@ -1,0 +1,68 @@
+{
+  "generatedDate": "2026-09-08",
+  "generator": "image_gen.imagegen (built-in)",
+  "purpose": "New photographic-style interior texture source images for lunar habitat application. Existing twelve source materials preserved.",
+  "notes": "AI-generated photographic-style material sources, not measured material scans. PBR conversion and runtime checks are managed separately. Four successful final image outputs. Floor had two failed network attempts before successful generation with a shorter prompt.",
+  "materials": [
+    {
+      "slug": "interior-wall",
+      "mode": "built-in",
+      "tool": "image_gen.imagegen",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square seamless physically based material base-color source texture for a lunar habitat interior wall, one material covering the entire image.\nPrimary request: ultra-realistic orthographic macro material photograph of a light cool gray-white microperforated acoustic wall panel. Tiny evenly spaced round microholes in a very fine regular square lattice, with delicate matte powder-coated surface micrograin between holes. Clean and contemporary aerospace habitation interior finish.\nComposition/framing: camera exactly perpendicular to the flat surface, no perspective, square image, all-over material, no panel edge. Fine homogeneous microhole scale suitable for believable wall cladding, not large dots. Every region equally sharply focused.\nLighting/mood: fully diffuse neutral cross-polarized studio illumination, de-lit albedo character, even brightness throughout, no directional highlights or baked shadows.\nColor palette: very light neutral-cool gray body, gently darker gray tiny recessed microholes; subtle realistic natural surface variation.\nConstraints: generate a single square material only; tileable edges, seamless across all four sides, small consistent pattern; material flat in the image plane; dry matte surface. No words, labels, watermark, logo, border, diagram, collage, split image, sphere, room, furniture, objects, heavy dirt, scratches, seams, dramatic light, vignette, depth of field or oblique angle.",
+      "generatedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08041-ff86-7cd3-a23c-b3ef4661e467\\exec-b18ea03c-c7f1-4904-8de2-b6e0dd95db69.png",
+      "savedPath": "assets/textures/source/interior-wall.png",
+      "visualInspection": {
+        "passed": true,
+        "notes": "Visually inspected generated image: square, full-frame light-gray microperforated acoustic panel; consistent fine hole lattice and matte micrograin, no objects, text, edge or collage. Overall even lighting. Tiny hole interiors include shallow relief cues; pixel-exact periodicity has not been measured.",
+        "inspectedVia": "built-in generated image preview"
+      }
+    },
+    {
+      "slug": "interior-upholstery",
+      "mode": "built-in",
+      "tool": "image_gen.imagegen",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square seamless physically based material base-color source texture for lunar habitat furniture upholstery, one material covering the whole image.\nPrimary request: ultra-realistic orthographic macro photograph of new premium tightly woven upholstery cloth in light neutral gray, a compact fine plain weave of tiny interlaced fibers. Soft matte surface with believable microscopic fiber texture and very restrained yarn variation, suitable for a clean spacecraft lounge seat.\nComposition/framing: camera exactly perpendicular to an entirely flat stretched cloth surface; square image; material fills every pixel; fine and even weave, sharp detail everywhere. The cloth is perfectly flat, unstained and unworn.\nLighting/mood: neutral cross-polarized diffuse material-scan illumination, nearly de-lit albedo, homogeneous brightness edge to edge with no broad light gradients or baked shadows.\nColor palette: neutral pale gray, subtle gray-on-gray fiber differences only; no colored threads.\nConstraints: one single square material, seamless repeating pattern at all four boundaries, small-scale dense textile weave. No folds, wrinkles, fabric edge, sewing stitches, piping, seams, stains, fuzz clumps, denim twill, large weave, text, labels, logos, watermarks, collage, swatch grid, border, sphere, furniture, room, objects, perspective, vignette, highlights or depth of field.",
+      "generatedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08041-ff86-7cd3-a23c-b3ef4661e467\\exec-b5bc6b59-56d9-4541-92d9-d4b83c38c8fa.png",
+      "savedPath": "assets/textures/source/interior-upholstery.png",
+      "visualInspection": {
+        "passed": true,
+        "notes": "Visually inspected generated image: full-frame neutral light-gray densely woven upholstery, flat and sharply focused, no wrinkles, seams, object, text or border. Fine individual yarns and slight natural variation are visible under even illumination. Pixel-exact seamlessness has not been measured.",
+        "inspectedVia": "built-in generated image preview"
+      }
+    },
+    {
+      "slug": "interior-floor",
+      "mode": "built-in",
+      "tool": "image_gen.imagegen",
+      "prompt": "Use case: photorealistic-natural\nAsset type: one square seamless base-color texture for a 3D lunar habitat interior floor.\nPrimary request: realistic perpendicular macro photograph of clean medium neutral-gray antistatic rubber sheet flooring. Fine dense rubber grain and tiny flush embedded light-gray and charcoal granules, restrained contrast, matte finish. Single flat continuous material filling the whole square, evenly sharp across the image.\nLighting: uniform neutral diffuse cross-polarized illumination, de-lit albedo appearance, no directional lighting, no broad gradients.\nConstraints: tileable matching edges, small fine granules only, no visible tile joints, no tread, no grooves, no large chips, no marble veins, no surface edges, no rooms, furniture, objects, sphere, collage, text, border, logo, watermark, vignette or perspective.",
+      "generatedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08041-ff86-7cd3-a23c-b3ef4661e467\\exec-6ab18172-44da-43b6-848f-028f85f88857.png",
+      "savedPath": "assets/textures/source/interior-floor.png",
+      "visualInspection": {
+        "passed": true,
+        "notes": "Visually inspected generated image: square full-frame medium neutral-gray antistatic rubber appearance with fine flush gray/charcoal inclusions and subtle surface grain. Matte, no tread, grooves, joints, cracks, furniture, text or border. Overall uniform illumination. Pixel-exact seamlessness has not been measured.",
+        "inspectedVia": "built-in generated image preview"
+      }
+    },
+    {
+      "slug": "interior-worktop",
+      "mode": "built-in",
+      "tool": "image_gen.imagegen",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square seamless physically based material base-color source texture for a lunar habitat worktop, one material covering the whole image.\nPrimary request: ultra-realistic orthographic macro material photograph of a clean light gray-white solid-surface composite worktop. Dense uniform pale composite matrix with extremely fine sparse mineral specks, subtle tiny neutral gray dots. Refined smooth satin-matte finish, contemporary sanitary scientific interior working surface.\nComposition/framing: camera exactly perpendicular to the flat continuous slab surface; square image; uninterrupted material fills every pixel, finely detailed and evenly focused across the entire image.\nLighting/mood: fully diffuse neutral cross-polarized studio material-scan lighting, evenly de-lit albedo, no gradients, no directional highlights, no reflected objects, no baked shadows.\nColor palette: light neutral gray-white, very subtle sparse gray mineral micro-speckles, low contrast.\nConstraints: one single square seamless tileable material, clean and homogeneous, no veins, no marble or granite pattern, no large terrazzo chips, no mottled clouds, no slab edge, joints, cracks, stains, scratches, cut marks, room, objects, furniture, sink, sphere, collage, swatch chart, border, text, watermark, logos, perspective, vignette or depth of field.",
+      "generatedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08041-ff86-7cd3-a23c-b3ef4661e467\\exec-922ca9aa-31a8-42c2-abba-801a900f431b.png",
+      "savedPath": "assets/textures/source/interior-worktop.png",
+      "visualInspection": {
+        "passed": true,
+        "notes": "Visually inspected generated image: continuous full-frame light-gray white solid composite surface with tiny scattered mineral specks. Clean and even, no marble veining, slab edge, large chips, objects, text or border. No broad lighting gradient. Pixel-exact seamlessness has not been measured.",
+        "inspectedVia": "built-in generated image preview"
+      }
+    }
+  ],
+  "failedAttempts": [
+    {
+      "slug": "interior-floor",
+      "count": 2,
+      "prompt": "Use case: photorealistic-natural\nAsset type: square seamless physically based material base-color source texture for a lunar habitat interior floor, one material covering the entire image.\nPrimary request: ultra-realistic orthographic macro material photograph of mid-gray antistatic homogeneous rubber resilient flooring with very fine embedded mineral-like rubber granules. Dense solid medium neutral-gray matrix, tiny sparsely varied lighter and darker gray inclusions embedded flush in the surface. Clean new practical aerospace habitation flooring, fine gently stippled dry matte finish.\nComposition/framing: camera perfectly perpendicular to flat uninterrupted flooring, square image, same material fills every pixel, uniformly crisp microdetail. Fine granules only, no big chips, surface appears solid and continuous.\nLighting/mood: uniform neutral cross-polarized diffuse material-scan light; de-lit albedo character with no directional highlights or shadows and no large gradients.\nColor palette: neutral medium gray with restrained micro variation, tiny light-gray and charcoal flecks, low-to-moderate contrast.\nConstraints: one square flat seamless tileable texture, visually homogeneous all across the surface with continuous edges. No tread, grooves, tiles, joints, cracks, marble veins, large terrazzo chips, pebbles, spilled objects, dirt, scratches, feet, furniture, room, sphere, collage, swatch grid, border, text, logo, watermark, vignette, perspective or depth of field.",
+      "error": "network error sending request to built-in image generation endpoint; no output returned"
+    }
+  ]
+}

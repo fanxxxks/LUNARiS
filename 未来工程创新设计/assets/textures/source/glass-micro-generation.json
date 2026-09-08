@@ -1,0 +1,9 @@
+{
+  "generator": "built-in image_gen.imagegen",
+  "generatedDate": "2026-09-08",
+  "slug": "glass-micro",
+  "sourceGeneratedPath": "C:\\Users\\frank\\.codex\\generated_images\\01a08023-73d3-7153-8ae2-b42ed8a8ae0b\\exec-f7c15eb5-6216-422c-bb73-596cdb003218.png",
+  "workspacePath": "D:/future-engineer-designment/LUNARiS/未来工程创新设计/assets/textures/source/glass-micro.png",
+  "prompt": "Use case: photorealistic-natural. Asset type: square fullbleed seamless glass micro-surface scan for a ROUGHNESS-ONLY PBR map on transparent clear spacecraft windows. Generate one square approximately 2048x2048 orthographic flat material scan. Completely uniform mid-light neutral gray field with only EXTREMELY FAINT very fine almost invisible cleaning wipe hairline scratches, subtle fine irregular wipe streaks, a few sparse microscopic dust motes. Maintained almost perfectly clean smooth engineering glass microfinish, not visibly distressed. Very low contrast, gray-on-gray, neutral color with no tint. As this will drive glass roughness, do not draw transparency, scenery, reflections, highlights, shadow or light gradients; only the faint microscopic surface variation against flat uniform neutral gray. No cracks, no frost, no fog, no rain droplets, no large smears, no opaque dirt patches, no edges, no objects, no frame, no border, no text, no material sphere, no perspective, no vignette. Seamless edge-to-edge evenly flat texture suitable for subtle roughness variation.",
+  "inspection": "Generated source is RGBA 1254x1254 with transparent clear areas and sparse faint wipe hairlines/dust. No scene reflection, border, fog or cracks. Requested opaque mid-light gray was not preserved: use ALPHA channel as subtle roughness variation rather than RGB alone. Preserve original RGBA."
+}

@@ -4,29 +4,32 @@
       "sha256": "706b8c0de2deff6cbc0c87e2cdedfd33a78b7ffd76cebb4549012f197ba611fe",
       "family": "Lunaris Serif",
       "output": "lunaris-serif-bold.woff2",
-      "bytes": 317104,
-      "glyphCodepoints": 671,
+      "bytes": 398080,
+      "glyphCodepoints": 851,
       "missingCjk": []
     },
     "SpaceGrotesk": {
       "sha256": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72",
       "family": "Lunaris Display",
       "output": "lunaris-display.woff2",
-      "bytes": 33104,
+      "bytes": 32968,
       "glyphCodepoints": 426,
       "missingCjk": []
     }
   },
   "textFiles": [
-    "lunar-ui.html",
-    "simulation-core.js",
-    "lunar-app.js",
-    "lunar-connectivity.js",
-    "lunar-model-profiles.js",
-    "lunar-modules.js",
-    "lunar-renderer.js",
-    "lunar-scene.js",
-    "lunar-scheduler.js"
+    "src/ui/template.html",
+    "src/core/scheduler.js",
+    "src/core/simulation.js",
+    "src/scene/connectivity.js",
+    "src/scene/interiors.js",
+    "src/scene/modules.js",
+    "src/scene/renderer.js",
+    "src/scene/scene.js",
+    "src/scene/studio-transition.js",
+    "src/scene/surfaces.js",
+    "src/server/server.cjs",
+    "src/ui/app.js"
   ],
-  "characters": 673
+  "characters": 853
 }

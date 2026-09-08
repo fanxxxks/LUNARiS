@@ -1,0 +1,20 @@
+{
+  "name": "lunaris-simulation",
+  "version": "7.0.0",
+  "private": true,
+  "description": "Lunar habitat simulator with local planning and GLM-5.3 scheduling",
+  "scripts": {
+    "start": "node src/server/server.cjs",
+    "build": "node scripts/build-simulation.cjs",
+    "build:fonts": "python scripts/build-fonts.py",
+    "build:textures": "node scripts/build-textures.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "sharp": "0.35.4",
+    "three": "0.160.0"
+  }
+}

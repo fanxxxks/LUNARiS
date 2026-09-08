@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "用户提供的舱体近景，作为材质真实感参考",
+  "slug": "deck-tread",
+  "prompt": "Use case: product-mockup. Asset: one production square tileable PBR base-color texture for the LUNARIS realtime lunar habitat. Image 1 is a material realism reference, NOT the output layout. Create a flat orthographic macro photographic material scan, filling the entire square edge to edge. Strictly no perspective, no objects, no text, no border, no sphere, no vignette, no cast shadows, no bright specular highlights and no large-scale lighting gradient. Cross-polarized diffuse neutral illumination; retain true tiny surface detail, physically believable wear and natural imperfection. Seamless all four edges. Aim for a 2048 square high-detail texture. Subject: clean grey anodized aerospace anti-slip aluminum deck, a subtle repeating small diamond lozenge tread pattern pressed into the metal; each raised tread tiny and uniform (at least 20 repeats across the tile), fine machining scratches and restrained dusty wear between treads. Neutral mid grey, realistic mechanical precision. Do not exaggerate relief or use checkerboard tiles."
+}

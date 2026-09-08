@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>LUNARIS / 材质图册与内景应用</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101315;--panel:#191d20;--edge:#30363a;--ink:#eef1ed;--muted:#a8b0b0;--accent:#dfc28e;--mono:Consolas,"SFMono-Regular",monospace}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:5px}button{cursor:pointer}::selection{background:#dfc28e;color:#101315}
+    .shell{width:min(1440px,100%);padding:0 56px;margin:auto}.topbar{height:84px;border-bottom:1px solid var(--edge);display:flex;align-items:center;justify-content:space-between;gap:24px}.wordmark{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:19px;font-weight:700;letter-spacing:.19em}.wordmark svg{width:26px;height:26px;color:var(--accent)}.topnote{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted)}
+    .hero{padding:59px 0 47px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end}.eyebrow{color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.15em;margin:0 0 17px}.hero h1{font-size:clamp(32px,4.6vw,60px);line-height:1.18;letter-spacing:-.045em;font-weight:500;margin:0 0 19px}.hero h1 span{font-family:var(--mono);font-weight:400;letter-spacing:-.045em}.intro{color:var(--muted);font-size:14px;line-height:1.95;max-width:675px;margin:0}.metrics{display:flex;gap:36px;padding-bottom:3px}.metric strong{display:block;font:36px/1 var(--mono);font-weight:400;color:var(--ink);margin-bottom:10px}.metric span{font-size:11px;color:var(--muted);white-space:nowrap}.metric+.metric{padding-left:36px;border-left:1px solid var(--edge)}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:19px 0;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}.tabs{display:flex;gap:5px;flex-wrap:wrap}.tab{border:1px solid transparent;background:transparent;color:var(--muted);border-radius:4px;padding:10px 14px;font-size:12px;transition:background .15s,color .15s}.tab .short{font:10px var(--mono);margin-left:8px;opacity:.65}.tab[aria-pressed="true"]{background:var(--accent);color:#191a16}.tab:hover:not([aria-pressed="true"]){background:#232a2e;color:var(--ink)}.toolbar-note{font:11px var(--mono);color:var(--muted);white-space:nowrap}.map-explainer{margin:14px 0 27px;font-size:12px;color:var(--muted);line-height:1.8;min-height:22px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 24px;padding-bottom:55px}
+    .card{min-width:0;background:var(--panel);border:1px solid var(--edge);border-radius:7px;overflow:hidden;transition:border-color .18s}.card:hover{border-color:#72736a}.preview{display:block;position:relative;overflow:hidden;aspect-ratio:1/1;background:#24292c}.preview img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .4s;image-rendering:auto}.preview:hover img{transform:scale(1.045)}.preview::after{content:"查看原文件 ↗";position:absolute;right:15px;bottom:15px;padding:9px 12px;border:1px solid #ffffff25;border-radius:3px;background:#101315e8;color:#f1f0e9;font-size:11px;opacity:0;transform:translateY(4px);transition:opacity .18s,transform .18s}.preview:hover::after,.preview:focus-visible::after{opacity:1;transform:translateY(0)}.map-badge{position:absolute;top:13px;left:13px;padding:6px 8px;background:#101315dd;border:1px solid #ffffff20;color:#e8e9e3;border-radius:3px;letter-spacing:.055em;font:10px var(--mono);pointer-events:none}.card-number{position:absolute;top:15px;right:15px;padding:3px 5px;font:10px var(--mono);color:#fff;mix-blend-mode:difference;pointer-events:none}.missing{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted);font-size:12px;line-height:1.8}.preview.unavailable img{visibility:hidden}.preview.unavailable .missing{display:flex}.body{padding:19px 19px 17px}.title-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.body h2{font-weight:500;font-size:16px;line-height:1.6;letter-spacing:.01em;margin:0}.family{font:10px var(--mono);color:var(--muted);letter-spacing:.01em;margin:7px 0 15px}.specs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:0;padding:13px 0 16px;border-top:1px solid var(--edge)}.specs dt{font-size:10px;color:var(--muted);margin-bottom:7px}.specs dd{font:12px var(--mono);margin:0;color:#d8ddda}.card-actions{display:flex;gap:18px;align-items:center;border-top:1px solid var(--edge);padding-top:14px}.download{font-size:11px;color:var(--accent);display:inline-flex;gap:7px;align-items:center}.source{font-size:11px;color:var(--muted);margin-left:auto}.download:hover,.source:hover{color:white}.glass-note{margin:0 0 15px;font-size:10px;color:#c9bfad;line-height:1.7}
+    .notes{border-top:1px solid var(--edge);padding:30px 0 34px;display:grid;grid-template-columns:1fr 1fr;gap:48px}.notes h2{margin:0 0 11px;font-size:12px;font-weight:500;color:#d8ddda}.notes p{font-size:11px;line-height:1.95;margin:0;color:var(--muted)}.notes code{font:10px var(--mono);color:#ccd1cc}.footer{border-top:1px solid var(--edge);padding:22px 0 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;color:#717e80;font:10px var(--mono);letter-spacing:.065em}.footer a:hover{color:var(--accent)}
+    @media(min-width:1700px){.shell{width:1540px}.grid{gap:32px}.hero{padding-top:72px}}
+    @media(max-width:1050px){.shell{padding:0 32px}.hero{grid-template-columns:1fr;gap:28px}.metrics{gap:26px}.metric+.metric{padding-left:26px}.metric strong{font-size:28px}.metrics .metric{display:flex;align-items:center;gap:12px}.metric strong{margin:0}.grid{gap:22px 18px}.body{padding:17px 15px}.body h2{font-size:14px}.toolbar-note{display:none}.tab{padding:9px 12px}}
+    @media(max-width:760px){.shell{padding:0 22px}.topbar{height:68px}.wordmark{font-size:16px}.topnote{font-size:9px;letter-spacing:.03em}.hero{padding:36px 0 30px}.hero h1{font-size:36px}.intro{font-size:12px}.eyebrow{font-size:9px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 16px}.map-explainer{font-size:11px;margin-bottom:21px}.tab{padding:9px 11px;font-size:11px}.tab .short{font-size:9px;margin-left:4px}.notes{grid-template-columns:1fr;gap:22px}.preview::after{font-size:10px;right:10px;bottom:10px;padding:7px 9px}.specs{gap:7px}.specs dt{font-size:9px}.specs dd{font-size:11px}.source,.download{font-size:10px}.card-actions{gap:8px}}
+    @media(max-width:470px){.shell{padding:0 18px}.grid{grid-template-columns:1fr;gap:23px}.hero h1{font-size:32px}.hero{gap:25px}.topnote{display:none}.metric span{font-size:10px}.metric strong{font-size:26px}.metrics{gap:22px}.metric+.metric{padding-left:22px}.tabs{gap:4px}.tab{padding:10px 8px}.tab .short{display:none}.body{padding:20px}.body h2{font-size:17px}.family{font-size:11px}.specs dt{font-size:11px}.specs dd{font-size:13px}.source,.download{font-size:12px}.footer{flex-direction:column;align-items:flex-start}.map-badge{font-size:11px}.card-number{font-size:11px}}
+    .room-study{border-top:1px solid var(--edge);padding:32px 0 45px}.room-study h2{font-weight:500;font-size:25px;margin:0 0 10px}.room-study>p{font-size:12px;color:var(--muted);line-height:1.9}.room-study .tabs{margin:20px 0}.room-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.room-card{display:block;border:1px solid var(--edge);background:var(--panel);border-radius:7px;overflow:hidden}.room-card img{display:block;width:100%;aspect-ratio:1.68;object-fit:cover}.room-card span{display:block;padding:15px 18px;font-size:13px}.room-card:hover{border-color:var(--accent)}@media(max-width:760px){.room-grid{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}.preview:hover img{transform:none}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="wordmark" href="../../月宫华容_三维仿真软件.html" aria-label="返回 LUNARIS 三维仿真软件"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="12" stroke="currentColor"/><path d="M21 6a12 12 0 0 0 0 20A10.5 10.5 0 0 1 21 6Z" fill="currentColor"/><path d="M2 20 30 12" stroke="currentColor"/></svg>LUNARIS</a>
+      <span class="topnote">LUNAR HABITAT / MATERIAL ARCHIVE</span>
+    </header>
+    <section class="hero" aria-labelledby="page-title">
+      <div><p class="eyebrow">SURFACE STUDIES — VOL. 03 / METAL RESPONSE</p><h1 id="page-title"><span>LUNARIS</span> / 材质图册</h1><p class="intro">18 类舱体、内饰与环境表面，外壳采用原生 2K 细凹凸银色金属，清晰微纹理与宽幅金属反光呈现表面层次。<br>全部贴图均可离线浏览与下载。</p></div>
+      <div class="metrics" aria-label="18 类材质，6 种通道"><div class="metric"><strong>18</strong><span>材质种类</span></div><div class="metric"><strong>06</strong><span>贴图通道</span></div></div>
+    </section>
+    <nav class="toolbar" aria-label="选择贴图通道"><div class="tabs"><button type="button" class="tab" aria-pressed="true" data-map="albedo">颜色<span class="short">ALBEDO</span></button><button type="button" class="tab" aria-pressed="false" data-map="normal">法线<span class="short">NORMAL</span></button><button type="button" class="tab" aria-pressed="false" data-map="roughness">粗糙度<span class="short">ROUGH</span></button><button type="button" class="tab" aria-pressed="false" data-map="metalness">金属度<span class="short">METAL</span></button><button type="button" class="tab" aria-pressed="false" data-map="orm">ORM<span class="short">PACKED</span></button><button type="button" class="tab" aria-pressed="false" data-map="height">高度<span class="short">HEIGHT</span></button></div><span class="toolbar-note" id="resolution">1024 × 1024 · sRGB · JPG</span></nav>
+    <p class="map-explainer" id="map-description" aria-live="polite">颜色贴图：保留材质的色彩与细密表面纹理；立体光照由模型材质共同呈现。</p>
+    <section class="grid" id="material-grid" aria-label="材质贴图"></section>
+    <section class="room-study" aria-labelledby="room-study-title"><p class="eyebrow">IN THE HABITAT</p><h2 id="room-study-title">内景应用</h2><p>八类房间的历史实景截图，用于查看内饰布局；最新金属反光以三维软件为准。点击图片可查看大图。</p><div class="tabs" role="group" aria-label="切换实景楼层"><button class="tab" data-deck="lower" aria-pressed="true">下层内饰</button><button class="tab" data-deck="upper" aria-pressed="false">上层内饰</button></div><div id="room-grid" class="room-grid"></div></section>
+    <section class="notes" aria-label="贴图使用说明"><div><h2>通道与材质参数</h2><p>颜色贴图采用 <code>sRGB</code>；法线、ORM 与高度采用线性数据。法线为 <code>OpenGL (+Y)</code>。ORM 的红、绿、蓝通道依次保存环境遮蔽、粗糙度、金属度。卡片显示贴图基准参数，软件按外壳、框架和内饰部位调整最终效果；重复尺度以模型单位计。高度图用于查看推导的微表面起伏，当前软件未启用几何位移。</p></div><div><h2>来源与玻璃说明</h2><p>细凹凸银色金属与轻磨砂拉丝银合金由程序生成浅起伏和细纹，反光来自三维光照；其余微表面原图由 ImageGen 生成。法线、粗糙度与高度为生成和推导的近似，并非实测扫描数据。透明玻璃原图含透明区域与细微擦痕，其透明掩码用于微表面变化；颜色预览不代表玻璃的最终透光效果。源 PNG 保留原始透明通道，软件内玻璃保持透明。</p></div></section>
+    <footer class="footer"><span>LUNARIS · 2026 / LOCAL MATERIAL LIBRARY</span><a href="manifest.json" target="_blank" rel="noopener">查看材质清单 ↗</a></footer>
+  </main>
+  <script src="catalog-data.js"></script>
+  <script>
+    'use strict';
+    const materials = MATERIAL_ATLAS_DATA;
+    const channels = {
+      albedo:{name:'颜色',label:'ALBEDO / sRGB',file:'albedo.jpg',resolution:'1024 × 1024 · sRGB · JPG',description:'颜色贴图：保留材质的色彩与细密表面纹理；立体光照由模型材质共同呈现。'},
+      normal:{name:'法线',label:'NORMAL / +Y',file:'normal.png',resolution:'512 × 512 · Linear · PNG',description:'法线贴图：以 RGB 编码微表面朝向，让纤维、颗粒与细痕随光照呈现细小起伏。'},
+      roughness:{name:'粗糙度',label:'ROUGHNESS / LINEAR',file:'roughness.png',resolution:'512 × 512 · Linear · PNG',description:'粗糙度：浅色更粗糙，深色更光滑。此独立文件与运行时 ORM 的绿色通道完全一致。'},
+      metalness:{name:'金属度',label:'METALNESS / LINEAR',file:'metalness.png',resolution:'512 × 512 · Linear · PNG',description:'金属度：白色为金属，黑色为非金属。图中显示贴图基准金属度，软件会按具体部位叠加金属饰面效果。'},
+      orm:{name:'ORM',label:'ORM / LINEAR',file:'orm.png',resolution:'512 × 512 · Linear · PNG',description:'ORM 组合贴图：R = 环境遮蔽，G = 粗糙度，B = 金属度。当前颜色是数据编码效果。'},
+      height:{name:'高度',label:'HEIGHT / LINEAR',file:'height.png',resolution:'512 × 512 · Linear · PNG',description:'高度贴图：浅色表示相对凸起，深色表示相对凹陷；用于查看推导的细节，当前软件未启用几何位移。'}
+    };
+    const grid = document.getElementById('material-grid');
+    const cards = materials.map((material,index) => {
+      const article = document.createElement('article');
+      article.className = 'card';
+      const slug = material.slug;
+      article.innerHTML = '<a class="preview" target="_blank" rel="noopener"><img loading="lazy" decoding="async" width="1024" height="1024"><span class="map-badge"></span><span class="card-number">'+String(index+1).padStart(2,'0')+'</span><span class="missing">贴图文件暂未就绪<br>请完成材质构建后重新打开图册。</span></a><div class="body"><div class="title-line"><h2>'+material.name+'</h2></div><p class="family">'+slug+'</p><dl class="specs"><div><dt>粗糙度</dt><dd>'+material.roughness.toFixed(material.roughness===.075?3:2)+'</dd></div><div><dt>金属度</dt><dd>'+material.metalness.toFixed(2)+'</dd></div><div><dt>重复尺度</dt><dd>'+material.tileWorld+'</dd></div></dl>'+(slug==='glass-micro'?'<p class="glass-note">透明掩码保留于原图，微表面预览不代表最终透光。</p>':'')+'<div class="card-actions"><a class="download"><span aria-hidden="true">↓</span><span class="download-label"></span></a><a class="source" href="source/'+slug+'.png" target="_blank" rel="noopener">生成原图 ↗</a></div></div>';
+      grid.appendChild(article);
+      article.querySelector('.source').href=material.source.replace(/^assets\/textures\//,'');
+      if(material.usage){const usage=document.createElement('p');usage.className='glass-note';usage.textContent=material.usage;article.querySelector('.body').insertBefore(usage,article.querySelector('.specs'));}
+      const image = article.querySelector('img');
+      const preview = article.querySelector('.preview');
+      image.addEventListener('error',()=>preview.classList.add('unavailable'));
+      image.addEventListener('load',()=>preview.classList.remove('unavailable'));
+      return {material,article,image,preview,badge:article.querySelector('.map-badge'),download:article.querySelector('.download'),downloadLabel:article.querySelector('.download-label')};
+    });
+    function selectChannel(key){
+      const channel = channels[key];
+      if(!channel)return;
+      document.querySelectorAll('[data-map]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.map===key)));
+      const sizes=[...new Set(materials.map(m=>m.maps[key].width))].sort((a,b)=>a-b);
+      document.getElementById('resolution').textContent = sizes.map(n=>n+' × '+n).join(' / ')+' · '+(key==='albedo'?'sRGB · JPG':'Linear · PNG');
+      document.getElementById('map-description').textContent = channel.description;
+      cards.forEach(card=>{
+        const path = 'pbr/'+card.material.slug+'/'+channel.file;
+        card.preview.classList.remove('unavailable');
+        card.preview.href = path;
+        card.preview.setAttribute('aria-label','查看'+card.material.name+'的'+channel.name+'原文件');
+        card.image.alt = card.material.name+' · '+channel.name+'贴图';
+        card.image.src = path;
+        card.badge.textContent = channel.label+' / '+card.material.maps[key].width+' × '+card.material.maps[key].height;
+        card.download.href = path;
+        card.download.download = card.material.slug+'-'+channel.file;
+        card.downloadLabel.textContent = '下载'+channel.name+'贴图';
+      });
+    }
+    document.querySelectorAll('[data-map]').forEach(button=>button.addEventListener('click',()=>selectChannel(button.dataset.map)));
+    selectChannel('albedo');
+    const roomNames=['居住舱','生命支持舱','能源舱','生物培养舱','医疗舱','工程工坊','数据核心舱','指挥舱'];
+    function selectDeck(deck){
+      document.querySelectorAll('[data-deck]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.deck===deck)));
+      const roomGrid=document.getElementById('room-grid');roomGrid.replaceChildren();
+      roomNames.forEach((name,i)=>{const a=document.createElement('a'),img=document.createElement('img'),caption=document.createElement('span');a.className='room-card';a.href='gallery/room-'+i+'-'+deck+'-scene.png';a.target='_blank';a.rel='noopener';img.src=a.href;img.alt=name+' · '+(deck==='lower'?'下层':'上层')+'材质应用';img.loading='lazy';caption.textContent=String(i+1).padStart(2,'0')+' / '+name;a.append(img,caption);roomGrid.append(a);});
+    }
+    document.querySelectorAll('[data-deck]').forEach(b=>b.addEventListener('click',()=>selectDeck(b.dataset.deck)));selectDeck('lower');
+  </script>
+</body>
+</html>

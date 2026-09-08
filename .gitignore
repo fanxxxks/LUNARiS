@@ -1,0 +1,16 @@
+# Local dependencies and interpreter caches
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Temporary design, browser review and delivery artifacts
+.codex-review/
+.codex-build-*/
+*.log
+未来工程创新设计/交付/
+
+# Editor and operating-system metadata
+.DS_Store
+Thumbs.db
+.vscode/

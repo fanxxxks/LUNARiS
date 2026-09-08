@@ -1,0 +1,909 @@
+{
+  "files": [
+    {
+      "file": "character/Meshy_AI_business_man_characte_0908093642_image-to-3d-texture.glb",
+      "bytes": 110378624,
+      "sha256": "9f6d1b00b9c1c44cc2f4d87cd2273416ef1fb36ba0630327471fb70cf53c7470",
+      "animations": [],
+      "meshes": [
+        {
+          "vertices": 1579395,
+          "triangles": 3077270,
+          "geometrySHA256": "85fd50efea4faa4239082808135b4ce8c8488f17497399527f2cf457cafa42f4"
+        }
+      ],
+      "skins": [],
+      "images": [
+        {
+          "mimeType": "image/jpeg",
+          "bytes": 15817278,
+          "sha256": "6a48e5f736787837e7092c59347f823c8c790a7ceb5a1bc35fd8d0edb6c15013"
+        },
+        {
+          "mimeType": "image/jpeg",
+          "bytes": 2409860,
+          "sha256": "53bba6ece8742be15ae8c1da57556ce7ea9054d4a1d9feeafc9c0f23d36773c6"
+        },
+        {
+          "mimeType": "image/jpeg",
+          "bytes": 4681279,
+          "sha256": "9d5930ae33441dc3422c072c3d6a72ee8d4364498a2b340a159eacd95ff1c370"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_remeshed_0908093652_texture.glb",
+      "bytes": 53878444,
+      "sha256": "ff49b36bc97d7c9b301140a0fccd6dd0e18c5be005b6fa515ffcb30de18872c8",
+      "animations": [],
+      "meshes": [
+        {
+          "vertices": 16067,
+          "triangles": 15577,
+          "geometrySHA256": "1bdedfa782ba59b10bb30cd02c7dea3ec884176391245910d066fab731b21bd5"
+        }
+      ],
+      "skins": [],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 47848817,
+          "sha256": "2836dba3a0c2ea23997a67f2f82a7bb05fb2063222b549284883f9ff2e451721"
+        },
+        {
+          "mimeType": "image/png",
+          "bytes": 5420421,
+          "sha256": "4aed1bdb909f8d74c1a059fc2077c98d2b70e0ae2c853380d7ecbc6ddb04d4a1"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Idle_9_withSkin.glb",
+      "bytes": 47407992,
+      "sha256": "a952bfb4012be6707a5693710561a04b47a7082d5f624c9fbe3c3f965c7cf8ff",
+      "animations": [
+        {
+          "name": "Armature|Idle_9|baselayer",
+          "duration": 2.0333333015441895,
+          "channels": 72,
+          "tracksSHA256": "ac2b0e43b41c11f34056dd35d3399335788993e83c1962965816262e92d50989",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Running_withSkin.glb",
+      "bytes": 47393168,
+      "sha256": "04381c87322ecc4755dd85cf5b84184b6261107786c11482e6982894d0a07d0f",
+      "animations": [
+        {
+          "name": "Armature|running|baselayer",
+          "duration": 0.6666666865348816,
+          "channels": 72,
+          "tracksSHA256": "8493bcff0337f10e34bb9c389a4959cf665948c84e4dd686c428c0eb45d88258",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Step_Forward_and_Push_withSkin.glb",
+      "bytes": 47442768,
+      "sha256": "00b5929ed4c83988a4aabff3fb7280f8b25ed162f50ee6bd87720020f0643f6e",
+      "animations": [
+        {
+          "name": "Armature|Step_Forward_and_Push|baselayer",
+          "duration": 4.766666889190674,
+          "channels": 72,
+          "tracksSHA256": "de5454d73e4c3500bb4e789203621c948199f4e12a9d8a91a6974295c7ecae11",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Walking_withSkin.glb",
+      "bytes": 47397776,
+      "sha256": "709a4cad96ca17f6c5f603ef49ae58e18e08c8ca1ab7b18d879b3850c2473d99",
+      "animations": [
+        {
+          "name": "Armature|walking_man|baselayer",
+          "duration": 1.0666667222976685,
+          "channels": 72,
+          "tracksSHA256": "e4aded71cd9962ad072770ba8b1900e9bf35a1fa1dc09c2499d8f5c98bea1d71",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Wave_One_Hand_withSkin.glb",
+      "bytes": 47432712,
+      "sha256": "a422ced5a2644bea247f7afefbe1c39c294886315ed0ceaa734b14d6a1906309",
+      "animations": [
+        {
+          "name": "Armature|Wave_One_Hand|baselayer",
+          "duration": 4.133333206176758,
+          "channels": 72,
+          "tracksSHA256": "def365beba9acd628aa1a28fc991b73862cdd28715d4436b6cfe13f78ff6e336",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Idle_9_withSkin.glb",
+      "bytes": 47407992,
+      "sha256": "a952bfb4012be6707a5693710561a04b47a7082d5f624c9fbe3c3f965c7cf8ff",
+      "animations": [
+        {
+          "name": "Armature|Idle_9|baselayer",
+          "duration": 2.0333333015441895,
+          "channels": 72,
+          "tracksSHA256": "ac2b0e43b41c11f34056dd35d3399335788993e83c1962965816262e92d50989",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Running_withSkin.glb",
+      "bytes": 47393168,
+      "sha256": "04381c87322ecc4755dd85cf5b84184b6261107786c11482e6982894d0a07d0f",
+      "animations": [
+        {
+          "name": "Armature|running|baselayer",
+          "duration": 0.6666666865348816,
+          "channels": 72,
+          "tracksSHA256": "8493bcff0337f10e34bb9c389a4959cf665948c84e4dd686c428c0eb45d88258",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Step_Forward_and_Push_withSkin.glb",
+      "bytes": 47442768,
+      "sha256": "00b5929ed4c83988a4aabff3fb7280f8b25ed162f50ee6bd87720020f0643f6e",
+      "animations": [
+        {
+          "name": "Armature|Step_Forward_and_Push|baselayer",
+          "duration": 4.766666889190674,
+          "channels": 72,
+          "tracksSHA256": "de5454d73e4c3500bb4e789203621c948199f4e12a9d8a91a6974295c7ecae11",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Walking_withSkin.glb",
+      "bytes": 47397776,
+      "sha256": "709a4cad96ca17f6c5f603ef49ae58e18e08c8ca1ab7b18d879b3850c2473d99",
+      "animations": [
+        {
+          "name": "Armature|walking_man|baselayer",
+          "duration": 1.0666667222976685,
+          "channels": 72,
+          "tracksSHA256": "e4aded71cd9962ad072770ba8b1900e9bf35a1fa1dc09c2499d8f5c98bea1d71",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Wave_One_Hand_withSkin.glb",
+      "bytes": 47432712,
+      "sha256": "a422ced5a2644bea247f7afefbe1c39c294886315ed0ceaa734b14d6a1906309",
+      "animations": [
+        {
+          "name": "Armature|Wave_One_Hand|baselayer",
+          "duration": 4.133333206176758,
+          "channels": 72,
+          "tracksSHA256": "def365beba9acd628aa1a28fc991b73862cdd28715d4436b6cfe13f78ff6e336",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 16075,
+          "triangles": 15577,
+          "geometrySHA256": "ee5621578b402ce1a4aebbcd87ced2704e2147d0d0d20c1ed816b5562c5fb0aa"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "97cf8ac8aea8d02612a9f8fe9e5aab4276b266b2aa8c9f41f2f9f60987f07d6b"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429010,
+          "sha256": "98916b4ef2b056319090688b80b64d80578acf4d94987db673a218a7f2b71ea6"
+        }
+      ]
+    },
+    {
+      "file": "character/new/Business Man Rig.glb",
+      "bytes": 47379036,
+      "sha256": "822e0aaa050afec03869797e7b83c738762016923a7296c6ea1cdcf3eea30f75",
+      "animations": [
+        {
+          "name": "Armature|clip0|baselayer",
+          "duration": 0.03333333507180214,
+          "channels": 72,
+          "tracksSHA256": "6aff5f8341e80c2e38544471de1923d747be2db7e2d279cf463235976308bc9f",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 15957,
+          "triangles": 15577,
+          "geometrySHA256": "79c477a9277dd3c807368461d0122307889992eb81cc84cab443711c97c41fc1"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "fb69b5a3f5b862b654d07eed35f7f3eccc22cd4b2608bee552f9a36c0d275269"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429291,
+          "sha256": "25ce97fa5a70546cdd4bb76bed8e55e7dfb449e708dee30e8907c25f70abeae8"
+        }
+      ]
+    },
+    {
+      "file": "character/new/Meshy_AI_Business_Man_Rig_biped/Meshy_AI_Business_Man_Rig_biped_Animation_Ladder_Climb_Loop_withSkin.glb",
+      "bytes": 47399672,
+      "sha256": "108d7f5d208ee671a240896b83f94ae2464ed6acc005c1295f93c40e09569076",
+      "animations": [
+        {
+          "name": "Armature|Ladder_Climb_Loop|baselayer",
+          "duration": 1.6333333253860474,
+          "channels": 72,
+          "tracksSHA256": "d81e0938875c67c6acdf8147d9642256bd2d59df00759d907e6f93a61e4c7101",
+          "ladder": true
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 15957,
+          "triangles": 15577,
+          "geometrySHA256": "79c477a9277dd3c807368461d0122307889992eb81cc84cab443711c97c41fc1"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "fb69b5a3f5b862b654d07eed35f7f3eccc22cd4b2608bee552f9a36c0d275269"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429291,
+          "sha256": "25ce97fa5a70546cdd4bb76bed8e55e7dfb449e708dee30e8907c25f70abeae8"
+        }
+      ]
+    },
+    {
+      "file": "character/new/Meshy_AI_Business_Man_Rig_biped/Meshy_AI_Business_Man_Rig_biped_Animation_Running_withSkin.glb",
+      "bytes": 47387172,
+      "sha256": "8b95513a09be5fcf31b6e3afb6548374b43819832bcb726c3d55ff3d7b2b3f15",
+      "animations": [
+        {
+          "name": "Armature|running|baselayer",
+          "duration": 0.6666666865348816,
+          "channels": 72,
+          "tracksSHA256": "7ddf32b24334a2f54aeed240da38e0bf92ee4e7c227d4b304e6b737eb2ce56e1",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 15957,
+          "triangles": 15577,
+          "geometrySHA256": "79c477a9277dd3c807368461d0122307889992eb81cc84cab443711c97c41fc1"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "fb69b5a3f5b862b654d07eed35f7f3eccc22cd4b2608bee552f9a36c0d275269"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429291,
+          "sha256": "25ce97fa5a70546cdd4bb76bed8e55e7dfb449e708dee30e8907c25f70abeae8"
+        }
+      ]
+    },
+    {
+      "file": "character/new/Meshy_AI_Business_Man_Rig_biped/Meshy_AI_Business_Man_Rig_biped_Animation_Walking_withSkin.glb",
+      "bytes": 47391776,
+      "sha256": "f536e012c1f8c0290a6c323283d8ed1ede1be152a28f80d78f287776fa21cda1",
+      "animations": [
+        {
+          "name": "Armature|walking_man|baselayer",
+          "duration": 1.0666667222976685,
+          "channels": 72,
+          "tracksSHA256": "0996c1ea1bd3a68f6b9c86f5aacb576539a4fd50b9f5adc19e02b6700b66c1eb",
+          "ladder": false
+        }
+      ],
+      "meshes": [
+        {
+          "vertices": 15957,
+          "triangles": 15577,
+          "geometrySHA256": "79c477a9277dd3c807368461d0122307889992eb81cc84cab443711c97c41fc1"
+        }
+      ],
+      "skins": [
+        {
+          "joints": [
+            "Hips",
+            "LeftUpLeg",
+            "LeftLeg",
+            "LeftFoot",
+            "LeftToeBase",
+            "RightUpLeg",
+            "RightLeg",
+            "RightFoot",
+            "RightToeBase",
+            "Spine02",
+            "Spine01",
+            "Spine",
+            "LeftShoulder",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightShoulder",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+            "neck",
+            "Head",
+            "head_end",
+            "headfront"
+          ],
+          "bindSHA256": "fb69b5a3f5b862b654d07eed35f7f3eccc22cd4b2608bee552f9a36c0d275269"
+        }
+      ],
+      "images": [
+        {
+          "mimeType": "image/png",
+          "bytes": 46429291,
+          "sha256": "25ce97fa5a70546cdd4bb76bed8e55e7dfb449e708dee30e8907c25f70abeae8"
+        }
+      ]
+    }
+  ],
+  "exactDuplicates": [
+    [
+      "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Idle_9_withSkin.glb",
+      "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Idle_9_withSkin.glb"
+    ],
+    [
+      "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Running_withSkin.glb",
+      "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Running_withSkin.glb"
+    ],
+    [
+      "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Step_Forward_and_Push_withSkin.glb",
+      "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Step_Forward_and_Push_withSkin.glb"
+    ],
+    [
+      "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Walking_withSkin.glb",
+      "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Walking_withSkin.glb"
+    ],
+    [
+      "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Wave_One_Hand_withSkin.glb",
+      "character/Meshy_AI_business_man_rigged_biped11/Meshy_AI_business_man_rigged_biped_Animation_Wave_One_Hand_withSkin.glb"
+    ]
+  ]
+}
