@@ -4,23 +4,26 @@
       "sha256": "706b8c0de2deff6cbc0c87e2cdedfd33a78b7ffd76cebb4549012f197ba611fe",
       "family": "Lunaris Serif",
       "output": "lunaris-serif-bold.woff2",
-      "bytes": 398080,
-      "glyphCodepoints": 851,
+      "bytes": 459020,
+      "glyphCodepoints": 990,
       "missingCjk": []
     },
     "SpaceGrotesk": {
       "sha256": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72",
       "family": "Lunaris Display",
       "output": "lunaris-display.woff2",
-      "bytes": 32968,
+      "bytes": 33008,
       "glyphCodepoints": 426,
       "missingCjk": []
     }
   },
   "textFiles": [
     "src/ui/template.html",
+    "src/core/character-routing.js",
     "src/core/scheduler.js",
     "src/core/simulation.js",
+    "src/scene/character-portrait.js",
+    "src/scene/character.js",
     "src/scene/connectivity.js",
     "src/scene/interiors.js",
     "src/scene/modules.js",
@@ -31,5 +34,5 @@
     "src/server/server.cjs",
     "src/ui/app.js"
   ],
-  "characters": 853
+  "characters": 992
 }

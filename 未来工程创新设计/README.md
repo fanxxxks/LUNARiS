@@ -8,6 +8,8 @@
 - 直接打开 `月宫华容_三维仿真软件.html` 可离线演示，保留规则式直线调度；分层和模糊调度需通过上述本机服务启动。
 - 打开 `assets/textures/index.html` 查看材质图册；图册需要保留整个 `assets/textures/` 目录。
 - 在本目录执行 `npm run build`，或 `node scripts/build-simulation.cjs`，重建仿真成品。
+- 冯院长人物支持可收起侧栏、人物高亮、45 项带具体动机的自主活动、自然语言多站行程，以及搬运后行走和上下梯；使用方式见 `docs/冯院长功能使用说明.md`。
+- 修改角色素材后执行 `npm ci`、`npm run build:character`、`npm run build`；`character/README.md` 列出了必须保留的 6 个源动画。`npm run test:character` 运行人物调度检查。
 - 修改 UI 文案后，执行 `python -m pip install -r requirements.txt`、`npm run build:fonts`，再构建 HTML。
 - 修改材质源图或材质定义后，执行 `npm ci`、`npm run build:textures`，再构建 HTML。仅打包 HTML 不需要安装 npm 依赖。
 

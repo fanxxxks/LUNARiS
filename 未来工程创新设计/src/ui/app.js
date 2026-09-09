@@ -1,6 +1,7 @@
 const taskNames={vertical:'科研协作案例',cascade:'维修隔离案例',district:'基地扩建案例',manual:'手动调度',natural:'自然语言调度'};
 const phaseNames={ready:'已就绪',retract:'升降托架收拢',emptyLift:'空载升降机构定位',deploy:'升降托架展开',unlock:'解除泊位锁定',translate:'沿楼板导轨平移',elevate:'内部升降 · Y 轴跨层',dock:'落座对接并锁定',done:'重构完成'};
 const metres=n=>(n*C.config.metresPerUnit).toFixed(1),fmt=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+let fengPeng=null;
 let baseLayout=C.initial.slice(),baseElevators=C.config.baseY,moves=[],phases=[],duration=0,time=0,playing=false,estop=false,task='vertical',ready=false,events=[];
 let flowData=null,flowKey='',flowClock=0,benchmark=null,nextRenderDeadline=0,lastDiagnosticsAt=-Infinity;
 let previewMove=null,walking=false,sectionMode=false,needsRender=true,rafPending=false,inFrame=false,lastNow=performance.now(),snapshotCache=null;
@@ -39,13 +40,13 @@ $('otherViewsToggle').onclick=()=>showOtherViews($('otherViewsMenu').hidden);
 $('otherViewsToggle').addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();showOtherViews(true);$('closeup').focus();}});
 $('otherViews').addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('otherViewsMenu').hidden){e.preventDefault();e.stopPropagation();showOtherViews(false);$('otherViewsToggle').focus();}});
 document.querySelectorAll('[data-close-panel]').forEach(button=>button.onclick=()=>showPanel(null,true));
-document.addEventListener('click',event=>{if(activePanel&&!event.target.closest(railZone)&&event.target.tagName!=='CANVAS')showPanel(null);});
+document.addEventListener('click',event=>{if(activePanel&&!event.target.closest(railZone)&&event.target.tagName!=='CANVAS'&&!event.target.closest('.character-panel'))showPanel(null);});
 const overviewDistance=()=>mobile()?1320:1230;
 distance=goal.distance=overviewDistance();
 const audit=(event,detail)=>events.push({event,time:+time.toFixed(3),detail});
 function notify(message,bad=false){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').classList.toggle('bad',bad);$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,bad?6500:3800);}
 const blocked=()=>$('block').checked?[C.lift(1,'C')]:[];
-const snapshot=()=>{if(!snapshotCache||snapshotCache.base!==baseLayout||snapshotCache.phases!==phases||snapshotCache.time!==time)snapshotCache={base:baseLayout,phases,time,state:C.state(baseLayout,phases,time,baseElevators)};return snapshotCache.state;};
+const snapshot=()=>{const personTransfer=fengPeng?.transportState;if(personTransfer)return personTransfer;if(!snapshotCache||snapshotCache.base!==baseLayout||snapshotCache.phases!==phases||snapshotCache.time!==time)snapshotCache={base:baseLayout,phases,time,state:C.state(baseLayout,phases,time,baseElevators)};return snapshotCache.state;};
 function requestRender(){needsRender=true;resetAccumulation();if(!rafPending&&!inFrame){rafPending=true;lastNow=performance.now();nextRenderDeadline=0;requestAnimationFrame(frame);}}
 for(const event of ['pointerdown','pointerup','wheel','input','change','click','keydown','keyup'])document.addEventListener(event,requestRender,true);
 const putText=(id,value)=>{const e=$(id),v=String(value);if(e.textContent!==v)e.textContent=v;};
@@ -110,7 +111,7 @@ for(let level=0;level<C.config.layers;level++){
 }
 function setMapFloor(level){mapFloor=level;floorItems.forEach(item=>{const active=Number(item.dataset.level)===level;item.classList.toggle('map-current',active);item.children[1].hidden=!active;});}
 function applyFloorSelection(level){visibleFloor=level;if(level>=0)setMapFloor(level);$('allFloors').classList.toggle('active',level<0);$('allFloors').setAttribute('aria-pressed',String(level<0));floorItems.forEach(item=>{const active=Number(item.dataset.level)===level;item.classList.toggle('selected',active);item.querySelector('button').setAttribute('aria-pressed',String(active));});}
-function setFloor(level){leaveStudio();requestRender();applyFloorSelection(level);if(level<0)chooseView('overview');else{cutaway=false;roaming=false;viewName='layer';goal={yaw:.64,pitch:.72,distance:mobile()?1160:980,target:new T.Vector3(level>=2?-55:-12,C.config.baseY+level*C.config.pitchY+25,0)};updateViewButtons();}drawUI(snapshot());}
+function setFloor(level){fengPeng?.stopFollowing();leaveStudio();requestRender();applyFloorSelection(level);if(level<0)chooseView('overview');else{cutaway=false;roaming=false;viewName='layer';goal={yaw:.64,pitch:.72,distance:mobile()?1160:980,target:new T.Vector3(level>=2?-55:-12,C.config.baseY+level*C.config.pitchY+25,0)};updateViewButtons();}drawUI(snapshot());}
 $('allFloors').onclick=()=>setFloor(-1);
 function controls(){
  requestRender();lastUI=-Infinity;
@@ -123,6 +124,7 @@ function controls(){
 }
 function updateViewButtons(){viewButtons.forEach(id=>{$(id).classList.toggle('active',id===viewName);$(id).setAttribute('aria-pressed',String(id===viewName));});}
 function chooseView(name){
+ fengPeng?.stopFollowing();
 
  requestRender();resetPointerState();
  if(name==='studio'){
@@ -148,7 +150,7 @@ function showPlan(){
  $('log').innerHTML=moves.map(m=>`<li>${buildingNames[m.room]}<br>${C.nodes[m.from].label} → ${C.nodes[m.to].label}${m.vertical?' · 跨层':''}</li>`).join('')||'<li>选择建筑后，使用房间与空闲泊位。</li>';
 }
 function compile(name,auto=true){
-
+ fengPeng?.reset();
  naturalPlan=null;task=name;manualMode=false;pendingManual=false;estop=false;playing=false;time=0;baseLayout=C.initial.slice();baseElevators=C.config.baseY;previewMove=null;events=[];selectedRoom=C.missions[name].roomIds[0];
  try{const p=C.preset(name,blocked());moves=p.moves;const tl=C.timeline(moves,32,baseElevators);phases=tl.phases;duration=tl.duration;ready=true;playing=auto;audit('plan',{task,initial:baseLayout.slice(),target:p.target,blocked:blocked(),metresPerUnit:C.config.metresPerUnit});}
  catch(e){moves=[];phases=[];duration=0;ready=false;notify(e.message,true);}
@@ -192,6 +194,17 @@ $('scheduleForm').onsubmit=async e=>{
   if(estop)throw Error('请先解除急停，再提交调度目标。');
   if(time>0&&time<duration)throw Error('当前计划尚未完成。请先播放至停靠完成，或恢复初始房间布局后提交。');
   const text=$('scheduleInput').value.trim();if(!text||text.length>600)throw Error('请输入 1–600 字的调度目标。');
+  if(/冯鹏|冯院长|冯老师/.test(text)){
+   let intent=LunarCharacter.parse(text);
+   if(!intent){
+    const token=document.querySelector('meta[name="lunaris-session"]')?.content;if(!token)throw Error('请用本机启动器打开以解析复杂人物指令，或使用“冯院长先去 R14，再去 R20”等明确指令。');
+    scheduling=true;$('scheduleSubmit').disabled=true;
+    const response=await fetch('/api/interpret',{method:'POST',headers:{'Content-Type':'application/json','X-Lunaris-Session':token},body:JSON.stringify({text,layout:snapshot().layout,blocked:blocked(),kind:'character_itinerary'})});
+    const result=await response.json();if(!response.ok)throw Error(result.error);intent=LunarCharacter.validateIntent(result.intent);
+   }
+   await fengPeng.dispatch(intent);putText('scheduleStatus',intent.interpretation||'人物控制已更新');$('scheduleTargets').replaceChildren();return;
+  }
+  if(fengPeng?.busy())throw Error('冯院长正在执行行程，请先停止人物任务并等待安全停靠，再调度房间。');
   const initial=snapshot().layout.slice(),elevators=structuredClone(snapshot().elevators),stamp=scheduleStamp();
   scheduling=true;$('scheduleSubmit').disabled=true;putText('scheduleStatus','正在解析目标并搜索可通行的搬运路线…');
   const p=await computeNaturalPlan(text,initial,blocked());
@@ -243,14 +256,14 @@ $('speed').onchange=()=>setPlaybackRate(Number($('speed').value));
 $('speedMenu').addEventListener('keydown',e=>{const index=playbackRates.findIndex(n=>$('rate'+n)===document.activeElement);let next=index;if(e.key==='ArrowDown')next=(index+1)%playbackRates.length;else if(e.key==='ArrowUp')next=(index-1+playbackRates.length)%playbackRates.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=playbackRates.length-1;else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeSpeedMenu(true);return;}else if(e.key==='Tab'){closeSpeedMenu(true);return;}else return;e.preventDefault();$('rate'+playbackRates[next]).focus();});
 $('speedToggle').addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();$('speedMenu').hidden=false;$('speedToggle').setAttribute('aria-expanded','true');$('rate'+$('speed').value).focus();}});
 document.addEventListener('click',e=>{if(!e.target.closest('.speed-control'))closeSpeedMenu();});
-$('play').onclick=()=>{if(!ready)return;if(estop){estop=false;notify('急停已解除。');}if(time>=duration)time=0;playing=!playing;if(playing&&(cutaway||viewName==='closeup'||studioMode))chooseView('overview');audit(playing?'play':'pause');controls();};
-$('replay').onclick=()=>{time=0;playing=true;estop=false;pendingManual=false;if(cutaway||viewName==='closeup'||studioMode)chooseView('overview');audit('restart');controls();};
-$('timeline').oninput=e=>{if(estop)return;if(studioMode)chooseView('overview');playing=false;pendingManual=false;const requested=Number(e.target.value);time=Math.abs(duration-requested)<.025?duration:Math.max(0,Math.min(duration,requested));audit('seek');controls();drawUI(snapshot());};
+$('play').onclick=()=>{if(fengPeng?.busy()){notify('请先停止人物行程并等待安全停靠。',true);return;}if(!ready)return;if(estop){estop=false;notify('急停已解除。');}if(time>=duration)time=0;playing=!playing;if(playing&&(cutaway||viewName==='closeup'||studioMode))chooseView('overview');audit(playing?'play':'pause');controls();};
+$('replay').onclick=()=>{if(fengPeng?.busy()){notify('请先停止人物行程并等待安全停靠。',true);return;}time=0;playing=true;estop=false;pendingManual=false;if(cutaway||viewName==='closeup'||studioMode)chooseView('overview');audit('restart');controls();};
+$('timeline').oninput=e=>{if(estop||fengPeng?.busy())return;if(studioMode)chooseView('overview');playing=false;pendingManual=false;const requested=Number(e.target.value);time=Math.abs(duration-requested)<.025?duration:Math.max(0,Math.min(duration,requested));audit('seek');controls();drawUI(snapshot());};
 function exitManual(){
  manualMode=false;pendingManual=false;previewMove=null;chooseView('overview');controls();drawUI(snapshot());
 }
 function enterManual(){
-
+ if(fengPeng?.busy()){notify('请先停止人物行程，再进入房间手动调度。',true);return;}
  if(studioMode)chooseView('overview');
  naturalPlan=null;const st=snapshot();baseLayout=st.layout.slice();baseElevators=structuredClone(st.elevators);moves=[];phases=[];duration=0;time=0;playing=false;manualMode=true;pendingManual=false;task='manual';previewMove=null;estop=false;ready=true;roaming=false;cutaway=false;if(viewName==='roam'||viewName==='mechanism')chooseView('overview');showPlan();controls();drawUI(snapshot());audit('manual-start',{layout:baseLayout.slice()});
 }
@@ -282,7 +295,7 @@ $('flowScenario').onchange=()=>{flowKey='';requestRender();};
 $('showLinks').onchange=()=>requestRender();
 $('cameraBenchmark').onclick=()=>{if(benchmark){finishBenchmark(true);return;}playing=false;controls();chooseView('overview');const warmup=performance.now();benchmark={start:warmup,samples:[],last:0,initialYaw:goal.yaw,mode:qualityMode};putText('cameraBenchmark','停止检测');putText('benchmarkStatus','预热 · 即将旋转镜头采样 8 秒');requestRender();};
 function finishBenchmark(cancelled=false){if(!benchmark)return;const b=benchmark;benchmark=null;putText('cameraBenchmark','镜头性能检测');if(b.samples.length){const sorted=b.samples.slice().sort((a,b)=>a-b),mean=b.samples.reduce((a,b)=>a+b,0)/b.samples.length,p95=sorted[Math.floor((sorted.length-1)*.95)];putText('benchmarkStatus',`${cancelled?'已停止 · ':''}${renderProfiles[b.mode].label} ${Math.round(1000/mean)} FPS · P95 ${p95.toFixed(1)} ms · ${b.samples.length} 帧`);}else putText('benchmarkStatus','检测已取消');requestRender();}
-$('sectionView').onclick=()=>{if(studioMode)chooseView('closeup');sectionMode=!sectionMode;$('sectionView').classList.toggle('active',sectionMode);$('sectionView').setAttribute('aria-pressed',String(sectionMode));if(sectionMode)chooseView('closeup');requestRender();};
+$('sectionView').onclick=()=>{fengPeng?.stopFollowing();if(studioMode)chooseView('closeup');sectionMode=!sectionMode;$('sectionView').classList.toggle('active',sectionMode);$('sectionView').setAttribute('aria-pressed',String(sectionMode));if(sectionMode)chooseView('closeup');requestRender();};
 function moveAxis(axis,sign){
  if(!manualMode)return;
  const layout=snapshot().layout,node=layout.indexOf(selectedRoom),to=C.neighbor(node,axis,sign);
@@ -334,7 +347,7 @@ $('targetFps').onchange=()=>{if(benchmark)finishBenchmark(true);nextRenderDeadli
 $('exposure').oninput=()=>{renderer.toneMappingExposure=Number($('exposure').value);postMat.uniforms.exposure.value=Number($('exposure').value);requestRender();};
 $('lighting').onchange=()=>{setLighting($('lighting').value);requestRender();};
 $('export').onclick=()=>{
- const data={version:'7.0',display:'LUNARIS six-face modular habitat and personnel traffic simulation',coordinateSystem:'X horizontal, Y vertical, Z depth',metresPerSceneUnit:C.config.metresPerUnit,config:C.config,initialLayout:baseLayout,initialElevators:baseElevators,slots:C.slots,nodes:C.nodes,shafts:C.shafts,mission:naturalPlan?{title:taskNames.natural,request:naturalPlan.request,targetRoomIds:naturalPlan.roomIds,targetNodes:naturalPlan.nodes}:C.missions[task]||null,moves,phases,predictedSeconds:duration,events,current:snapshot(),time,blocked:blocked(),traffic:flowData,rendering:{quality:qualityMode,antiAliasing:aaMode,msaaSamples:aaSamples,targetFps:$('targetFps').value==='native'?'native':Number($('targetFps').value)},scope:'Geometry, assumed traffic demand and sequence; not structural or evacuation certification'};
+ const data={character:fengPeng?.export(),version:'7.0',display:'LUNARIS six-face modular habitat and personnel traffic simulation',coordinateSystem:'X horizontal, Y vertical, Z depth',metresPerSceneUnit:C.config.metresPerUnit,config:C.config,initialLayout:baseLayout,initialElevators:baseElevators,slots:C.slots,nodes:C.nodes,shafts:C.shafts,mission:naturalPlan?{title:taskNames.natural,request:naturalPlan.request,targetRoomIds:naturalPlan.roomIds,targetNodes:naturalPlan.nodes}:C.missions[task]||null,moves,phases,predictedSeconds:duration,events,current:snapshot(),time,blocked:blocked(),traffic:flowData,rendering:{quality:qualityMode,antiAliasing:aaMode,msaaSamples:aaSamples,targetFps:$('targetFps').value==='native'?'native':Number($('targetFps').value)},scope:'Geometry, assumed traffic demand and sequence; not structural or evacuation certification'};
  const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='LUNARIS-XYZ-simulation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 function drawUI(st){
@@ -379,6 +392,7 @@ function updateRoute(st){
 }
 let lastUI=-1;
 function draw(dt,now,force=false){
+ fengPeng?.sync();
  const st=snapshot(),instanceChanged=updateInstances(st.positions,visibleFloor,cutaway,st.orientations,!studioMode&&sectionMode?selectedRoom:-1,studioMode?selectedRoom:-1,studioDeck),mechanismChanged=updateMechanism(st,visibleFloor,cutaway);
  const connectionState=updateConnectivity(st,{showLinks:$('showLinks').checked&&!cutaway,visibleFloor,sectionRoom:sectionMode?selectedRoom:-1});
  obstruction.visible=$('block').checked&&(visibleFloor<0||visibleFloor===1);
@@ -400,7 +414,7 @@ function draw(dt,now,force=false){
  activeLabel.hidden=studioMode||!$('labels').checked||!r.userData.visible||v.z>1||v.z< -1||sx<60||sx>w-60||sy<70||sy>h-20;const labelText=`${buildingNames[labelRoom]}${st.type==='elevate'?'  ↑↓ Y '+metres(st.head[1])+' m':''}`;if(activeLabel.textContent!==labelText)activeLabel.textContent=labelText;if(!activeLabel.hidden){activeLabel.style.transform=`translate3d(${sx}px,${sy}px,0) translate(-50%,-100%)`;activeLabel.style.left='0';activeLabel.style.top='0';}
  if(now-lastUI>100){drawUI(snapshot());lastUI=now;}
  if(naturalPlan&&time>=duration&&!scheduling&&!$('scheduleStatus').classList.contains('bad')){putText('scheduleStatus',`目标已完成 · ${naturalPlan.summary}\n${naturalPlan.roomIds.length} 个目标模块已到达规划位置并高亮。`);}
- const moving=playing||studioTransition.active||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0);
+ const moving=Boolean(fengPeng?.needsFrames)||playing||studioTransition.active||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0);
  renderScene({moving});return true;
 }
 function resize(){resizeRenderTargets(Math.max(1,stage.clientWidth),Math.max(1,stage.clientHeight));if(studioMode){if(studioTransition.active)cancelStudioSwitch(true);focusStudio();}requestRender();}
@@ -422,7 +436,7 @@ function updateRenderDiagnostics(){
 function frame(now){
  rafPending=false;inFrame=true;
  if(document.hidden){needsRender=true;inFrame=false;return;}
- const ongoing=playing||walking||studioTransition.active||cameraChanging()||Boolean(benchmark)||(roaming&&held.size>0),fpsLimit=Number($('targetFps').value),frameBudget=fpsLimit>0?1000/fpsLimit:0;
+ const ongoing=Boolean(fengPeng?.needsFrames)||playing||walking||studioTransition.active||cameraChanging()||Boolean(benchmark)||(roaming&&held.size>0),fpsLimit=Number($('targetFps').value),frameBudget=fpsLimit>0?1000/fpsLimit:0;
  // Native mode submits every available browser frame. Optional caps keep their
  // accumulated phase instead of discarding the remainder at each submission.
  if(frameBudget&&ongoing&&!needsRender&&now+.5<nextRenderDeadline){inFrame=false;rafPending=true;requestAnimationFrame(frame);return;}
@@ -433,12 +447,15 @@ function frame(now){
   if(pendingManual&&before?.phase){const docking=phases.find(p=>p.type==='dock'&&p.moveIndex===before.phase.moveIndex);if(docking&&time>=docking.end){time=docking.end;enterManual();}}
   if(time>=duration&&phases.length){time=duration;playing=false;audit('complete');if($('loop').checked&&!manualMode){time=0;playing=true;audit('loop');}controls();}
  }
- const active=needsRender||playing||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||hasPendingRefinement(),force=needsRender;needsRender=false;
+ fengPeng?.tick(Math.min(.25,realDt));
+ const active=Boolean(fengPeng?.needsFrames)||needsRender||playing||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||hasPendingRefinement(),force=needsRender;needsRender=false;
  if(active){draw(dt,now,force);nextRenderDeadline=frameBudget?(nextRenderDeadline===0||now+.5<nextRenderDeadline||now-nextRenderDeadline>frameBudget?now+frameBudget:nextRenderDeadline+frameBudget):0;if(realDt<.5){frameSamples.push(realDt*1000);if(frameSamples.length>480)frameSamples.shift();fpsFrames++;fpsElapsed+=realDt;}
   if(fpsElapsed>1){putText('fps',Math.round(fpsFrames/fpsElapsed));const sorted=frameSamples.slice().sort((a,b)=>a-b);putText('frameTime',sorted[Math.floor((sorted.length-1)*.95)].toFixed(1));fpsFrames=0;fpsElapsed=0;}
   if(now-lastDiagnosticsAt>=1000){updateRenderDiagnostics();lastDiagnosticsAt=now;}$('loading').hidden=true;
  }
- inFrame=false;if(!rafPending&&(playing||studioTransition.active||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||needsRender||hasPendingRefinement())){rafPending=true;requestAnimationFrame(frame);}
+ inFrame=false;if(!rafPending&&(fengPeng?.needsFrames||playing||studioTransition.active||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||needsRender||hasPendingRefinement())){rafPending=true;requestAnimationFrame(frame);}
 }
-requestRender();
+fengPeng=createFengPeng();
+ window.LunarisCharacterDiagnostics=()=>fengPeng.export();
+ requestRender();
 })();

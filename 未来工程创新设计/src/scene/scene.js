@@ -323,9 +323,10 @@ function indexExactGeometry(geo){
  if(source.length===count)return;attrs.forEach((a,k)=>{const out=new Float32Array(source.length*a.itemSize);source.forEach((i,j)=>out.set(a.array.subarray(i*a.itemSize,(i+1)*a.itemSize),j*a.itemSize));geo.setAttribute(keys[k],new T.BufferAttribute(out,a.itemSize,a.normalized));});geo.setIndex(new T.BufferAttribute(source.length<65536?new Uint16Array(indices):indices,1));
 }
 const indexedGeometries=new Set();scene.traverse(o=>{if(o.isMesh&&!indexedGeometries.has(o.geometry)){indexExactGeometry(o.geometry);indexedGeometries.add(o.geometry);}});
-let lastFloor=null,lastFrameOnly=null,lastSection=null,lastStudio=null,lastStudioDeck=null;const instanceState=rooms.map(()=>null),instanceTransforms=rooms.map(()=>({shown:new T.Matrix4(),hidden:new T.Matrix4()}));
+let lastFloor=null,lastFrameOnly=null,lastSection=null,lastStudio=null,lastStudioDeck=null,lastCharacterDeck=null;const instanceState=rooms.map(()=>null),instanceTransforms=rooms.map(()=>({shown:new T.Matrix4(),hidden:new T.Matrix4()}));
 function updateInstances(positions,visibleFloor,frameOnly,orientations=null,sectionRoom=-1,studioRoom=-1,studioDeck='exterior'){
- const filterChanged=visibleFloor!==lastFloor||frameOnly!==lastFrameOnly||sectionRoom!==lastSection||studioRoom!==lastStudio||studioDeck!==lastStudioDeck,changed=new Set();
+ const characterDeck=fengPeng?.state.follow?(fengPeng.state.position[1]<39?'lower':'upper'):null;
+ const filterChanged=characterDeck!==lastCharacterDeck||visibleFloor!==lastFloor||frameOnly!==lastFrameOnly||sectionRoom!==lastSection||studioRoom!==lastStudio||studioDeck!==lastStudioDeck,changed=new Set();
  rooms.forEach((room,i)=>{const p=positions[i],o=orientations?.[i]||[0,0,0],visible=(studioRoom>=0?i===studioRoom:visibleFloor<0||Math.abs((p[1]-C.config.baseY)/C.config.pitchY-visibleFloor)<.52)&&!frameOnly;
   const prev=instanceState[i];if(filterChanged||!prev||p.some((v,k)=>v!==prev[k])||o.some((v,k)=>v!==prev[k+3])){room.position.fromArray(p);room.rotation.set(...o,'YXZ');room.userData.visible=visible;instanceState[i]=[...p,...o];changed.add(i);
    // Compose the room pose once, then reuse it across its material batches.
@@ -334,6 +335,7 @@ function updateInstances(positions,visibleFloor,frameOnly,orientations=null,sect
  });
  if(!changed.size)return false;
  for(const batch of moduleBatches){let first=Infinity,last=-1;batch.ids.forEach((id,j)=>{if(!changed.has(id))return;const room=rooms[id],shell=batch.layer==='skin'||batch.layer==='roof',section=shell&&id===sectionRoom;let show=room.userData.visible&&!section;
+  if(characterDeck&&id===sectionRoom&&batch.layer===(characterDeck==='lower'?'interior-upper':'interior-lower'))show=false;
   if(studioRoom>=0&&studioDeck!=='exterior'){if(shell)show=false;if(batch.layer==='interior-upper'&&studioDeck==='lower')show=false;if(batch.layer==='interior-lower'&&studioDeck==='upper')show=false;}
   batch.mesh.setMatrixAt(j,instanceTransforms[id][show?'shown':'hidden']);first=Math.min(first,j*16);last=Math.max(last,(j+1)*16);
  });if(last>=0){const buffer=batch.mesh.instanceMatrix;
@@ -343,7 +345,7 @@ function updateInstances(positions,visibleFloor,frameOnly,orientations=null,sect
    buffer.clearUpdateRanges?.();buffer.addUpdateRange?.(first,last-first);buffer.needsUpdate=true;batch.mesh.computeBoundingSphere();
   }}
  if(filterChanged){frameLevels.forEach((g,i)=>g.visible=visibleFloor<0||i===visibleFloor);posts.visible=visibleFloor<0;foundations.visible=visibleFloor<0||visibleFloor===0;}
- lastFloor=visibleFloor;lastFrameOnly=frameOnly;lastSection=sectionRoom;lastStudio=studioRoom;lastStudioDeck=studioDeck;renderer.shadowMap.needsUpdate=true;return true;
+ lastCharacterDeck=characterDeck;lastFloor=visibleFloor;lastFrameOnly=frameOnly;lastSection=sectionRoom;lastStudio=studioRoom;lastStudioDeck=studioDeck;renderer.shadowMap.needsUpdate=true;return true;
 }
 
 // Four local ceiling sources illuminate actual equipment in the room viewer.

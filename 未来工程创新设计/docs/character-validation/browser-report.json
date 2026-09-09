@@ -1,0 +1,677 @@
+{
+  "errors": [],
+  "initial": {
+    "name": "冯院长",
+    "room": 1,
+    "position": [
+      0,
+      14.08,
+      0
+    ],
+    "status": "待机",
+    "paused": false,
+    "autonomous": false,
+    "visits": [],
+    "index": 0,
+    "history": [
+      {
+        "event": "loaded",
+        "at": 0,
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "wave",
+          "push",
+          "climb"
+        ]
+      }
+    ],
+    "plan": null,
+    "needs": {
+      "fatigue": 0.08687249999999999,
+      "completed": {}
+    }
+  },
+  "traveling": {
+    "name": "冯院长",
+    "room": 1,
+    "position": [
+      0,
+      14.08,
+      0
+    ],
+    "status": "房间搬运",
+    "paused": false,
+    "autonomous": false,
+    "visits": [
+      {
+        "room": 14,
+        "seconds": 1,
+        "action": "idle",
+        "deck": "lower",
+        "point": {
+          "position": [
+            0,
+            14.08,
+            28.75
+          ],
+          "yaw": -1.5707963267948966
+        }
+      },
+      {
+        "room": 20,
+        "seconds": 1,
+        "action": "wave",
+        "deck": "lower"
+      }
+    ],
+    "index": 0,
+    "history": [
+      {
+        "event": "loaded",
+        "at": 0,
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "wave",
+          "push",
+          "climb"
+        ]
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 3.667200000000002,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 14,
+              "seconds": 1,
+              "action": "idle",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            },
+            {
+              "room": 20,
+              "seconds": 1,
+              "action": "wave",
+              "deck": "lower"
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R14 生命支持舱 → R20 医疗舱"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 4.8706000000000005,
+        "destination": 13,
+        "estimatedSeconds": 43.917314369658115,
+        "walkMetres": 15.375,
+        "moves": 2,
+        "search": {
+          "expanded": 1367,
+          "candidates": 4,
+          "fastest": 92.7599069622507,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      }
+    ],
+    "plan": {
+      "destination": 13,
+      "estimatedSeconds": 43.917314369658115,
+      "walkMetres": 15.375,
+      "moves": 2,
+      "search": {
+        "expanded": 1367,
+        "candidates": 4,
+        "fastest": 92.7599069622507,
+        "tolerance": 2,
+        "scope": "限时搜索中的最优候选"
+      }
+    },
+    "needs": {
+      "fatigue": 0.20394000000000004,
+      "completed": {}
+    }
+  },
+  "paused": {
+    "name": "冯院长",
+    "room": 1,
+    "position": [
+      0,
+      14.08,
+      0
+    ],
+    "status": "房间搬运",
+    "paused": true,
+    "autonomous": false,
+    "visits": [
+      {
+        "room": 14,
+        "seconds": 1,
+        "action": "idle",
+        "deck": "lower",
+        "point": {
+          "position": [
+            0,
+            14.08,
+            28.75
+          ],
+          "yaw": -1.5707963267948966
+        }
+      },
+      {
+        "room": 20,
+        "seconds": 1,
+        "action": "wave",
+        "deck": "lower"
+      }
+    ],
+    "index": 0,
+    "history": [
+      {
+        "event": "loaded",
+        "at": 0,
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "wave",
+          "push",
+          "climb"
+        ]
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 3.667200000000002,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 14,
+              "seconds": 1,
+              "action": "idle",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            },
+            {
+              "room": 20,
+              "seconds": 1,
+              "action": "wave",
+              "deck": "lower"
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R14 生命支持舱 → R20 医疗舱"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 4.8706000000000005,
+        "destination": 13,
+        "estimatedSeconds": 43.917314369658115,
+        "walkMetres": 15.375,
+        "moves": 2,
+        "search": {
+          "expanded": 1367,
+          "candidates": 4,
+          "fastest": 92.7599069622507,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      }
+    ],
+    "plan": {
+      "destination": 13,
+      "estimatedSeconds": 43.917314369658115,
+      "walkMetres": 15.375,
+      "moves": 2,
+      "search": {
+        "expanded": 1367,
+        "candidates": 4,
+        "fastest": 92.7599069622507,
+        "tolerance": 2,
+        "scope": "限时搜索中的最优候选"
+      }
+    },
+    "needs": {
+      "fatigue": 0.20591500000000001,
+      "completed": {}
+    }
+  },
+  "completed": {
+    "name": "冯院长",
+    "room": 19,
+    "position": [
+      0,
+      14.08,
+      28.75
+    ],
+    "status": "待机",
+    "paused": false,
+    "autonomous": false,
+    "visits": [],
+    "index": 0,
+    "history": [
+      {
+        "event": "loaded",
+        "at": 0,
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "wave",
+          "push",
+          "climb"
+        ]
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 3.667200000000002,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 14,
+              "seconds": 1,
+              "action": "idle",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            },
+            {
+              "room": 20,
+              "seconds": 1,
+              "action": "wave",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R14 生命支持舱 → R20 医疗舱"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 4.8706000000000005,
+        "destination": 13,
+        "estimatedSeconds": 43.917314369658115,
+        "walkMetres": 15.375,
+        "moves": 2,
+        "search": {
+          "expanded": 1367,
+          "candidates": 4,
+          "fastest": 92.7599069622507,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "arrived",
+        "at": 48.8031000000003,
+        "room": 13,
+        "index": 0
+      },
+      {
+        "event": "activity-complete",
+        "at": 49.82790000000029,
+        "room": 13
+      },
+      {
+        "event": "plan",
+        "at": 50.257100000000285,
+        "destination": 19,
+        "estimatedSeconds": 50.97222222222221,
+        "walkMetres": 30,
+        "moves": 0,
+        "search": {
+          "expanded": 1811,
+          "candidates": 1759,
+          "fastest": 50.97222222222221,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "arrived",
+        "at": 101.24609999999942,
+        "room": 19,
+        "index": 1
+      },
+      {
+        "event": "activity-complete",
+        "at": 102.30039999999936,
+        "room": 19
+      }
+    ],
+    "plan": {
+      "destination": 19,
+      "estimatedSeconds": 50.97222222222221,
+      "walkMetres": 30,
+      "moves": 0,
+      "search": {
+        "expanded": 1811,
+        "candidates": 1759,
+        "fastest": 50.97222222222221,
+        "tolerance": 2,
+        "scope": "限时搜索中的最优候选"
+      }
+    },
+    "needs": {
+      "fatigue": 2.557509999999997,
+      "completed": {}
+    }
+  },
+  "final": {
+    "name": "冯院长",
+    "room": 19,
+    "position": [
+      0,
+      14.080000000000013,
+      27.120549999999838
+    ],
+    "status": "行走",
+    "paused": true,
+    "autonomous": true,
+    "visits": [
+      {
+        "room": 12,
+        "seconds": 17,
+        "action": "idle",
+        "deck": "upper",
+        "activityId": "6:5",
+        "point": {
+          "position": [
+            0,
+            43.08,
+            -28.75
+          ],
+          "yaw": -1.5707963267948966
+        }
+      }
+    ],
+    "index": 0,
+    "history": [
+      {
+        "event": "loaded",
+        "at": 0,
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "wave",
+          "push",
+          "climb"
+        ]
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 3.667200000000002,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 14,
+              "seconds": 1,
+              "action": "idle",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            },
+            {
+              "room": 20,
+              "seconds": 1,
+              "action": "wave",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R14 生命支持舱 → R20 医疗舱"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 4.8706000000000005,
+        "destination": 13,
+        "estimatedSeconds": 43.917314369658115,
+        "walkMetres": 15.375,
+        "moves": 2,
+        "search": {
+          "expanded": 1367,
+          "candidates": 4,
+          "fastest": 92.7599069622507,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "arrived",
+        "at": 48.8031000000003,
+        "room": 13,
+        "index": 0
+      },
+      {
+        "event": "activity-complete",
+        "at": 49.82790000000029,
+        "room": 13
+      },
+      {
+        "event": "plan",
+        "at": 50.257100000000285,
+        "destination": 19,
+        "estimatedSeconds": 50.97222222222221,
+        "walkMetres": 30,
+        "moves": 0,
+        "search": {
+          "expanded": 1811,
+          "candidates": 1759,
+          "fastest": 50.97222222222221,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "arrived",
+        "at": 101.24609999999942,
+        "room": 19,
+        "index": 1
+      },
+      {
+        "event": "activity-complete",
+        "at": 102.30039999999936,
+        "room": 19
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 102.47519999999935,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 20,
+              "seconds": 1,
+              "action": "wave",
+              "deck": "upper",
+              "point": {
+                "position": [
+                  0,
+                  43.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R20 医疗舱"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 102.90849999999935,
+        "destination": 19,
+        "estimatedSeconds": 22.02546296296295,
+        "walkMetres": 17.5,
+        "moves": 0,
+        "search": {
+          "expanded": 1811,
+          "candidates": 1812,
+          "fastest": 22.02546296296295,
+          "tolerance": 1.1012731481481477,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "arrived",
+        "at": 124.9517999999988,
+        "room": 19,
+        "index": 0
+      },
+      {
+        "event": "activity-complete",
+        "at": 125.95959999999882,
+        "room": 19
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 126.05539999999881,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 20,
+              "seconds": 1,
+              "action": "idle",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R20 医疗舱"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 126.4095999999988,
+        "destination": 19,
+        "estimatedSeconds": 20.75153150714715,
+        "walkMetres": 15.780192534648666,
+        "moves": 0,
+        "search": {
+          "expanded": 1811,
+          "candidates": 1812,
+          "fastest": 20.75153150714715,
+          "tolerance": 1.0375765753573576,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "arrived",
+        "at": 147.18599999999907,
+        "room": 19,
+        "index": 0
+      },
+      {
+        "event": "activity-complete",
+        "at": 148.19049999999908,
+        "room": 19
+      },
+      {
+        "event": "plan",
+        "at": 153.70189999999894,
+        "destination": 11,
+        "estimatedSeconds": 95.92361111111113,
+        "walkMetres": 78.45,
+        "moves": 0,
+        "search": {
+          "expanded": 1811,
+          "candidates": 1683,
+          "fastest": 95.92361111111113,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      }
+    ],
+    "plan": {
+      "destination": 11,
+      "estimatedSeconds": 95.92361111111113,
+      "walkMetres": 78.45,
+      "moves": 0,
+      "search": {
+        "expanded": 1811,
+        "candidates": 1683,
+        "fastest": 95.92361111111113,
+        "tolerance": 2,
+        "scope": "限时搜索中的最优候选"
+      }
+    },
+    "needs": {
+      "fatigue": 3.845564999999975,
+      "completed": {}
+    }
+  },
+  "performance": {
+    "cpuMs": "5.1",
+    "gpuMs": "38.3",
+    "fps": "25",
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A788) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  }
+}

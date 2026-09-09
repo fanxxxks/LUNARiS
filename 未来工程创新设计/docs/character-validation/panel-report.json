@@ -1,0 +1,22 @@
+{
+  "errors": [],
+  "desire": "说了这么久，想喝杯水润润嗓子，顺便歇一歇。",
+  "mobileBounds": {
+    "x": 68,
+    "y": 12,
+    "width": 310,
+    "height": 598.5
+  },
+  "checks": [
+    "default collapse",
+    "portrait toggle",
+    "independent highlight switch",
+    "follow restores 24 rooms",
+    "no thought bubble",
+    "visible highlight",
+    "hidden highlight off",
+    "purpose preserved during travel",
+    "keyboard collapse",
+    "mobile bounds"
+  ]
+}

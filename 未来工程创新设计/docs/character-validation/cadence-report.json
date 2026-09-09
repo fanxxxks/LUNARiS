@@ -1,0 +1,72 @@
+{
+  "errors": [],
+  "completedPlans": [
+    {
+      "event": "plan",
+      "at": 47.25,
+      "destination": 0,
+      "estimatedSeconds": 11.38888888888889,
+      "walkMetres": 15.375,
+      "moves": 0,
+      "search": {
+        "expanded": 1418,
+        "candidates": 7318,
+        "fastest": 11.38888888888889,
+        "tolerance": 0.5694444444444445,
+        "scope": "限时搜索中的最优候选"
+      }
+    },
+    {
+      "event": "plan",
+      "at": 95,
+      "destination": 2,
+      "estimatedSeconds": 77.86705395299145,
+      "walkMetres": 30,
+      "moves": 2,
+      "search": {
+        "expanded": 1383,
+        "candidates": 52,
+        "fastest": 77.86705395299145,
+        "tolerance": 2,
+        "scope": "限时搜索中的最优候选"
+      }
+    },
+    {
+      "event": "plan",
+      "at": 225.75,
+      "destination": 8,
+      "estimatedSeconds": 61.657521090480486,
+      "walkMetres": 39.18019253464867,
+      "moves": 1,
+      "search": {
+        "expanded": 1518,
+        "candidates": 2838,
+        "fastest": 61.657521090480486,
+        "tolerance": 2,
+        "scope": "限时搜索中的最优候选"
+      }
+    },
+    {
+      "event": "plan",
+      "at": 338.75,
+      "destination": 11,
+      "estimatedSeconds": 88.59260372150996,
+      "walkMetres": 55,
+      "moves": 2,
+      "search": {
+        "expanded": 1683,
+        "candidates": 1201,
+        "fastest": 88.59260372150996,
+        "tolerance": 2,
+        "scope": "限时搜索中的最优候选"
+      }
+    }
+  ],
+  "view": {
+    "follow": false,
+    "name": "layer",
+    "floor": 3,
+    "section": false,
+    "visibleRooms": 3
+  }
+}

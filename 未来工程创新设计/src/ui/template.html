@@ -37,6 +37,15 @@
  <p id="scheduleStatus" class="command-status" role="status" aria-live="polite"></p><ol id="scheduleTargets" class="command-targets"></ol>
 </section>
 <div id="stage" class="stage" role="img" aria-label="五层紧凑月面模块聚落。24 个房间以积木式错层退台堆叠，六向舱口连接相邻单元，三条内部升降通道支持空间重构。拖动旋转，右键拖动平移，滚轮缩放。"></div>
+<aside class="character-panel is-collapsed" id="characterPanel" aria-label="冯院长人物面板"><button id="characterPanelToggle" class="character-panel-toggle" type="button" aria-expanded="false" aria-controls="characterPanelBody" aria-label="展开冯院长面板"><!-- CHARACTER PORTRAIT --><span class="character-avatar-label">冯院长</span></button><div id="characterPanelBody" class="character-panel-body" inert aria-hidden="true"><div class="character-hero"><header class="character-heading"><div><small>人物与行程</small><span>冯院长</span></div><button id="characterPanelClose" class="panel-close" aria-label="收起冯院长面板"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
+ <p id="characterStatus" role="status">载入角色…</p><div class="character-intention"><span class="character-thought-label">此刻的想法</span><p id="characterThought" aria-live="polite">先安顿下来，想想今天最想做的事。</p></div>
+ <button id="characterPortrait" class="character-portrait" type="button" aria-label="切换为行走模型" aria-pressed="false"><!-- CHARACTER STANDEE --><canvas id="characterPortraitCanvas" aria-hidden="true" hidden></canvas><span id="characterPortraitHint" class="character-portrait-hint">查看行走模型 ↗</span></button></div><div class="character-content">
+ <progress id="characterProgress" max="1" value="0" aria-label="当前人物任务进度"></progress><p id="characterMetrics">8 类舱室 · 自主活动</p>
+ <div class="character-options"><label><input id="characterVisible" type="checkbox" checked>显示人物</label><label><input id="characterHighlight" type="checkbox" checked>人物高亮</label><label><input id="characterAuto" type="checkbox" checked>自主活动</label></div>
+ <label class="character-delay">待机后产生想法 <input id="characterIdle" type="number" min="5" max="600" value="30" step="5" aria-label="自主活动待机秒数"> 秒</label>
+ <div class="character-actions"><button id="characterFocus" aria-pressed="false">跟随观察</button><button id="characterPause">暂停</button><button id="characterStop">停止</button></div>
+ <button id="characterExample" class="character-command">用自然语言安排行程 ↗</button><p id="characterItinerary" class="character-itinerary"></p>
+</div></div></aside>
 <section id="studioPanel" class="studio-panel" aria-label="房间图鉴" hidden>
  <div class="panel-top"><strong>房间图鉴</strong><button id="exitStudio" class="panel-close" aria-label="退出房间图鉴，返回全景"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
  <div class="studio-heading"><span id="studioCode">HAB</span><h2 id="studioTitle">居住舱</h2></div>

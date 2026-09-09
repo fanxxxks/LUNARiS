@@ -1,7 +1,7 @@
 'use strict';
 // Local-only bridge: the cloud key never enters HTML, browser storage or exports.
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const C=require('../core/simulation.js'),S=require('../core/scheduler.js');
+const C=require('../core/simulation.js'),S=require('../core/scheduler.js'),P=require('../core/character-routing.js');
 const root=path.resolve(__dirname,'../..'),port=Number(process.env.LUNARIS_PORT||8787),origin=`http://127.0.0.1:${port}`;
 const configPath=path.join(root,'llm-config.json');
 const session=crypto.randomBytes(32).toString('hex'),project=crypto.createHash('sha256').update(root).digest('hex').slice(0,16);
@@ -28,9 +28,11 @@ function context(layout,blocked){return {
  rooms:layout.flatMap((r,n)=>r===null?[]:[{id:r+1,name:`R${String(r+1).padStart(2,'0')}`,type:C.roomTypeNames[C.roomTypes[r]],node:n,floor:C.nodes[n].level+1,col:C.nodes[n].col,row:C.nodes[n].row}]),
  nodes:C.nodes.map(n=>({id:n.id,floor:n.level+1,col:n.col,row:n.row,lift:n.lift,closed:blocked.includes(n.id)})),
  };}
-async function interpret(text,layout,blocked,signal){
+const characterInstructions=`你是月面基地人物行程解析器。冯鹏、冯院长、冯老师是同一人。只返回 JSON，不生成坐标、代码或搬运步骤。目标格式：{"kind":"character_itinerary","command":"go","interpretation":"中文理解","speed":"walk","visits":[{"room":14,"seconds":8,"action":"idle","deck":"lower"}]}。room 为 1–24，按用户要求保留访问顺序和重复到访；seconds 为 0–3600 秒；action 只能是 idle、wave、push；deck 为舱内 lower 或 upper，不是基地楼层；speed 只能 walk 或 run。command 可为 pause、resume、stop、auto_on、auto_off，此时省略 visits。房间名称按提供的 visibleProfile 理解，不使用旧 type 标签猜测。功能名对应多个房间且无法唯一确定时返回 {"kind":"character_itinerary","clarification":"列出编号让用户选择"}。仅安排人物行程，不把房间移动写成人物目的地。不要忽略用户的顺序、停留、速度或动作要求。不能实现的动作或无法确定目标时返回 clarification。`;
+async function interpret(text,layout,blocked,signal,kind=null){
+ const character=kind==='character_itinerary'||/冯鹏|冯院长|冯老师/.test(text),scene=context(layout,blocked);if(character)scene.rooms.forEach(r=>r.visibleProfile=P.profiles[P.modelTypes[r.id-1]]);
  const c=config();let response;
- try{response=await fetch(c.baseUrl+'/chat/completions',{method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Authorization:'Bearer '+c.apiKey},body:JSON.stringify({model:c.model,temperature:0,reasoning_effort:'low',max_tokens:6000,messages:[{role:'system',content:instructions},{role:'user',content:JSON.stringify({instruction:text,scene:context(layout,blocked)})}]}),signal});}
+ try{response=await fetch(c.baseUrl+'/chat/completions',{method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Authorization:'Bearer '+c.apiKey},body:JSON.stringify({model:c.model,temperature:0,reasoning_effort:'low',max_tokens:6000,messages:[{role:'system',content:character?characterInstructions:instructions},{role:'user',content:JSON.stringify({instruction:text,scene})}]}),signal});}
  catch(e){if(signal.aborted)throw Error('模型响应超时或请求已取消，请稍后重试。');throw Error('无法连接并行科技模型服务，请检查网络后重试。');}
  if(!response.ok){await response.body?.cancel();const messages={401:'模型密钥无效，请检查本机配置。',403:'当前密钥没有模型访问权限。',429:'模型服务请求过多或额度不足，请稍后重试并检查账户。'};throw Error(messages[response.status]||`智能调度服务暂不可用（HTTP ${response.status}），请稍后重试。`);}
  let data;try{data=await response.json();}catch{throw Error('模型服务返回了无效响应，请重试。');}
@@ -38,7 +40,7 @@ async function interpret(text,layout,blocked,signal){
  if(data.choices?.[0]?.finish_reason==='length')throw Error('模型未能完整解析目标，请简化指令后重试。');
  const content=data.choices?.[0]?.message?.content;if(typeof content!=='string'||content.length>16000)throw Error('模型未返回有效的调度目标，请重试。');
  let intent;try{intent=JSON.parse(content.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,''));}catch{throw Error('模型输出格式不完整，请重新提交指令。');}
- return S.validateIntent(intent);
+ return character?P.validateIntent(intent):S.validateIntent(intent);
 }
 let busy=false;
 const server=http.createServer(async(req,res)=>{
@@ -60,7 +62,7 @@ const server=http.createServer(async(req,res)=>{
   let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{json(400,{error:'调度请求格式无效。'});return;}
   if(!body||typeof body.text!=='string'||!body.text.trim()||body.text.length>600)throw Error('请输入 1–600 字的调度目标。');
   C.validate(body.layout);if(!Array.isArray(body.blocked)||body.blocked.length>C.nodes.length||body.blocked.some(n=>!Number.isInteger(n)||!C.nodes[n]))throw Error('封闭通道数据无效。');
-  const intent=await interpret(body.text.trim(),body.layout,body.blocked,controller.signal);json(200,{intent});
+  const intent=await interpret(body.text.trim(),body.layout,body.blocked,controller.signal,body.kind);json(200,{intent});
  }catch(e){json(400,{error:e.message});}finally{clearTimeout(timer);res.off('close',cancel);busy=false;}
 });
 server.requestTimeout=80000;server.headersTimeout=10000;

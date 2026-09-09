@@ -1,0 +1,23 @@
+{
+  "viewport": [
+    1600,
+    1000
+  ],
+  "headless": true,
+  "results": [
+    {
+      "visible": false,
+      "benchmark": "精细 102 FPS · P95 16.9 ms · 820 帧",
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5060 Laptop GPU (0x00002D59) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "cpuMs": "3.6",
+      "gpuMs": "1.5"
+    },
+    {
+      "visible": true,
+      "benchmark": "精细 92 FPS · P95 16.9 ms · 734 帧",
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5060 Laptop GPU (0x00002D59) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "cpuMs": "4.8",
+      "gpuMs": "2.0"
+    }
+  ]
+}

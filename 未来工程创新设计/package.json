@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node src/server/server.cjs",
     "build": "node scripts/build-simulation.cjs",
+    "build:character": "node scripts/build-character.cjs",
+    "audit:character": "node scripts/audit-character.cjs",
+    "test:character": "node --test tests/character.test.cjs",
     "build:fonts": "python scripts/build-fonts.py",
     "build:textures": "node scripts/build-textures.cjs"
   },

@@ -1,0 +1,50 @@
+{
+  "errors": [],
+  "before": {
+    "mode": "walking",
+    "expanded": true,
+    "frames": 22,
+    "animationTime": 0.23779999999850948,
+    "initialized": true,
+    "width": 164.671875,
+    "height": 244
+  },
+  "after": {
+    "mode": "walking",
+    "expanded": true,
+    "frames": 118,
+    "animationTime": 0.6460999999985091,
+    "initialized": true,
+    "width": 164.671875,
+    "height": 244
+  },
+  "mobileBounds": {
+    "characterPortrait": {
+      "x": 238.046875,
+      "y": 117,
+      "right": 363,
+      "bottom": 382
+    },
+    "characterThought": {
+      "x": 79,
+      "y": 246.9375,
+      "right": 232.046875,
+      "bottom": 292.53125
+    },
+    "characterPanelBody": {
+      "x": 64,
+      "y": 94,
+      "right": 378,
+      "bottom": 647.015625
+    }
+  },
+  "checks": [
+    "illustration default",
+    "actual walking rig animation",
+    "click and Enter toggle",
+    "no simulation pause coupling",
+    "stop rendering on illustration and collapse",
+    "resume on expand",
+    "mobile text separation"
+  ]
+}

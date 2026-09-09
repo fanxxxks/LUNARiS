@@ -1,0 +1,32 @@
+[
+  {
+    "file": "character/Meshy_AI_business_man_characte_0908093642_image-to-3d-texture.glb",
+    "bytes": 110378624,
+    "sha256": "9f6d1b00b9c1c44cc2f4d87cd2273416ef1fb36ba0630327471fb70cf53c7470",
+    "reason": "Not referenced by the verified six-clip runtime build; replaced motion or unused unanimated source"
+  },
+  {
+    "file": "character/Meshy_AI_business_man_remeshed_0908093652_texture.glb",
+    "bytes": 53878444,
+    "sha256": "ff49b36bc97d7c9b301140a0fccd6dd0e18c5be005b6fa515ffcb30de18872c8",
+    "reason": "Not referenced by the verified six-clip runtime build; replaced motion or unused unanimated source"
+  },
+  {
+    "file": "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Running_withSkin.glb",
+    "bytes": 47393168,
+    "sha256": "04381c87322ecc4755dd85cf5b84184b6261107786c11482e6982894d0a07d0f",
+    "reason": "Not referenced by the verified six-clip runtime build; replaced motion or unused unanimated source"
+  },
+  {
+    "file": "character/Meshy_AI_business_man_rigged_biped/Meshy_AI_business_man_rigged_biped_Animation_Walking_withSkin.glb",
+    "bytes": 47397776,
+    "sha256": "709a4cad96ca17f6c5f603ef49ae58e18e08c8ca1ab7b18d879b3850c2473d99",
+    "reason": "Not referenced by the verified six-clip runtime build; replaced motion or unused unanimated source"
+  },
+  {
+    "file": "character/new/Business Man Rig.glb",
+    "bytes": 47379036,
+    "sha256": "822e0aaa050afec03869797e7b83c738762016923a7296c6ea1cdcf3eea30f75",
+    "reason": "Not referenced by the verified six-clip runtime build; replaced motion or unused unanimated source"
+  }
+]
