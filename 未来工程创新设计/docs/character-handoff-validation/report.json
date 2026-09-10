@@ -1,0 +1,254 @@
+{
+  "checks": [
+    "stop on final in-cabin leg clears task immediately",
+    "room request succeeds after Stop",
+    "paused ladder traversal safely completes before room scheduling",
+    "paused upper-deck activity yields to room scheduling",
+    "Stop cancels worker and settles its pending dispatch",
+    "paused room transport stops at docking and unblocks next request",
+    "autonomous activity cannot reclaim the scene during room planning",
+    "real room transport starts after handoff"
+  ],
+  "errors": [],
+  "requests": 6,
+  "character": {
+    "portrait": {
+      "mode": "illustration",
+      "expanded": true,
+      "frames": 0,
+      "animationTime": 0,
+      "initialized": false,
+      "width": 161.3785400390625,
+      "height": 238.6400146484375
+    },
+    "name": "冯院长",
+    "room": 1,
+    "position": [
+      30,
+      43.08,
+      -28.75
+    ],
+    "status": "待机",
+    "thought": "已停止人物行程，可以调度房间。",
+    "visible": true,
+    "highlighted": true,
+    "walkOnlyTrips": 0,
+    "view": {
+      "follow": false,
+      "name": "overview",
+      "floor": -1,
+      "section": false,
+      "visibleRooms": 24
+    },
+    "paused": false,
+    "autonomous": true,
+    "visits": [],
+    "index": 0,
+    "history": [
+      {
+        "event": "loaded",
+        "at": 0,
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "wave",
+          "push",
+          "climb"
+        ]
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 0.45010000000000006,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 2,
+              "seconds": 120,
+              "action": "idle",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R02 工程工坊"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 0.804200000000001,
+        "destination": 1,
+        "estimatedSeconds": 2.1296296296296293,
+        "walkMetres": 2.875,
+        "moves": 0,
+        "search": {
+          "expanded": 1422,
+          "candidates": 1423,
+          "fastest": 2.1296296296296293,
+          "tolerance": 0.10648148148148147,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 3.3792000000000013,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 2,
+              "seconds": 120,
+              "action": "idle",
+              "deck": "upper",
+              "point": {
+                "position": [
+                  0,
+                  43.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R02 工程工坊"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 3.729200000000002,
+        "destination": 1,
+        "estimatedSeconds": 20.241733333333332,
+        "walkMetres": 15.091964999999998,
+        "moves": 0,
+        "search": {
+          "expanded": 1422,
+          "candidates": 1423,
+          "fastest": 20.241733333333332,
+          "tolerance": 1.0120866666666666,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 17.5926,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 2,
+              "seconds": 120,
+              "action": "idle",
+              "deck": "upper",
+              "point": {
+                "position": [
+                  0,
+                  43.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R02 工程工坊"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 17.955100000000062,
+        "destination": 1,
+        "estimatedSeconds": 37.569444444444436,
+        "walkMetres": 26.25,
+        "moves": 0,
+        "search": {
+          "expanded": 1422,
+          "candidates": 1423,
+          "fastest": 37.569444444444436,
+          "tolerance": 1.8784722222222219,
+          "scope": "限时搜索中的最优候选"
+        }
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 49.10630000000018,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 3,
+              "seconds": 120,
+              "action": "idle",
+              "deck": "lower"
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R03 生物培养舱"
+        }
+      },
+      {
+        "event": "manual-itinerary",
+        "at": 49.17280000000017,
+        "intent": {
+          "kind": "character_itinerary",
+          "command": "go",
+          "visits": [
+            {
+              "room": 3,
+              "seconds": 120,
+              "action": "idle",
+              "deck": "lower",
+              "point": {
+                "position": [
+                  0,
+                  14.08,
+                  28.75
+                ],
+                "yaw": -1.5707963267948966
+              }
+            }
+          ],
+          "speed": "walk",
+          "interpretation": "R03 生物培养舱"
+        }
+      },
+      {
+        "event": "plan",
+        "at": 49.65620000000014,
+        "destination": 2,
+        "estimatedSeconds": 54.23515625,
+        "walkMetres": 27,
+        "moves": 2,
+        "search": {
+          "expanded": 1383,
+          "candidates": 193,
+          "fastest": 54.23515625,
+          "tolerance": 2,
+          "scope": "限时搜索中的最优候选"
+        }
+      }
+    ],
+    "plan": null,
+    "needs": {
+      "fatigue": 1.5536425000000749,
+      "completed": {}
+    },
+    "busy": false,
+    "planning": false,
+    "pendingCommand": null,
+    "roomScheduling": false,
+    "transferring": false
+  }
+}

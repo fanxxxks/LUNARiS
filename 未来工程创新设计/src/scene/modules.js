@@ -35,7 +35,9 @@ function moduleProfiles(){return [
  {code:'MED',name:'医疗舱',caption:'MEDICAL UNIT',color:'#db7c70'},
  {code:'ENG',name:'工程工坊',caption:'ENGINEERING UNIT',color:'#e4af56'},
  {code:'DCU',name:'数据核心舱',caption:'DATA CORE UNIT',color:'#9695ed'},
- {code:'CMD',name:'指挥舱',caption:'COMMAND UNIT',color:'#74b7ed'}
+ {code:'CMD',name:'指挥舱',caption:'COMMAND UNIT',color:'#74b7ed'},
+ {code:'GYM',name:'健身房',caption:'FITNESS UNIT',color:'#73c7b4'},
+ {code:'DIN',name:'餐厅',caption:'DINING UNIT',color:'#dfad78'}
 ];}
 function moduleDesignMaterials(){
  if(moduleDesignMaterials.value)return moduleDesignMaterials.value;
@@ -70,6 +72,8 @@ function moduleProfileGlyph(ctx,profile,x,y,size){
  else if(profile===4){ctx.fillRect(39,17,22,66);ctx.fillRect(17,39,66,22);}
  else if(profile===5){line([[23,78],[56,44]]);ctx.beginPath();ctx.arc(67,33,19,-.15,Math.PI*1.65);ctx.stroke();line([[86,30],[69,40],[60,30],[66,14]]);circle(23,78,6);}
  else if(profile===6){for(const yy of [17,43,69]){ctx.strokeRect(21,yy,58,17);ctx.fillRect(29,yy+6,5,5);line([[45,yy+8],[70,yy+8]]);}}
+ else if(profile===9){circle(50,50,23);line([[15,17],[15,83]]);line([[8,17],[8,36],[22,36],[22,17]]);line([[85,17],[78,44],[85,44],[85,83]]);}
+ else if(profile===8){line([[22,50],[78,50]]);for(const x of [18,30,70,82])line([[x,32],[x,68]]);}
  else{circle(50,50,12);for(const [a,b]of [[18,23],[82,23],[18,77],[82,77]]){line([[50+(a-50)*.3,50+(b-50)*.3],[a,b]]);circle(a,b,7);}}
  ctx.restore();
 }
@@ -111,6 +115,11 @@ function moduleRoofServices(roof,profile,m,p){
   for(const z of [-16,-8,0]){const rib=strip(-13,z,14,2);rib.rotation.y=-Math.PI/5;}strip(-13,7,38,2,p.paint);
  }else if(profile===6){
   for(const x of [-29,-18,-7,4]){pad(x,-8,7,27);for(let z=-18;z<4;z+=3)strip(x,z,5.8,.8);strip(x,5,5,1.4,p.paint);}
+ }else if(profile===9){
+  pad(-13,-8,38,26,m.panel);for(const x of [-25,-1]){port(x,-10,5);for(const z of [-19,0,4])strip(x,z,14,1.4,m.seam);}strip(-13,8,38,1.4,p.paint);
+ }else if(profile===8){
+  for(const x of [-25,-1]){pad(x,-8,16,26,m.panel);for(const z of [-16,-9,-2])strip(x,z,12,2,m.seam);port(x,6,2.4);}
+  strip(-13,8,38,1.4,p.paint);
  }else{
   pad(-13,-8,38,28,m.panel);port(-13,-8,9);
   const ring=mesh(roof,new T.RingGeometry(3.6,4.8,24),m.seam,-13,72.18,-8);ring.rotation.x=-Math.PI/2;

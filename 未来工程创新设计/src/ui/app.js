@@ -2,6 +2,7 @@ const taskNames={vertical:'科研协作案例',cascade:'维修隔离案例',dist
 const phaseNames={ready:'已就绪',retract:'升降托架收拢',emptyLift:'空载升降机构定位',deploy:'升降托架展开',unlock:'解除泊位锁定',translate:'沿楼板导轨平移',elevate:'内部升降 · Y 轴跨层',dock:'落座对接并锁定',done:'重构完成'};
 const metres=n=>(n*C.config.metresPerUnit).toFixed(1),fmt=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 let fengPeng=null;
+const backgroundAudio=createLunarAudio();
 let baseLayout=C.initial.slice(),baseElevators=C.config.baseY,moves=[],phases=[],duration=0,time=0,playing=false,estop=false,task='vertical',ready=false,events=[];
 let flowData=null,flowKey='',flowClock=0,benchmark=null,nextRenderDeadline=0,lastDiagnosticsAt=-Infinity;
 let previewMove=null,walking=false,sectionMode=false,needsRender=true,rafPending=false,inFrame=false,lastNow=performance.now(),snapshotCache=null;
@@ -52,7 +53,7 @@ for(const event of ['pointerdown','pointerup','wheel','input','change','click','
 const putText=(id,value)=>{const e=$(id),v=String(value);if(e.textContent!==v)e.textContent=v;};
 const viewButtons=['overview','closeup','topview','elevation','mechanism','roam','studio'];
 const studioProfileButtons=[],studioDeckButtons={exterior:'studioExterior',lower:'studioLower',upper:'studioUpper'};
-const studioDescriptions=[['单床睡眠区、对坐沙发、餐桌与生活收纳。','书桌、饮水台与盆栽，围绕起居与休息布置。'],['氧气储瓶、水回收过滤罐与空气循环设备。','过滤罐组、风机柜与生命保障监测。'],['电池机架、储能罐与配电逆变设备。','双电池机架、能源监测与配电操作台。'],['成熟叶菜水培架、营养液系统与显微分析台。','分层幼苗培养架、育苗区与显微分析台。'],['诊疗床、输液架、监护仪与医疗储物。','诊疗床、无菌耗材药柜与双屏检测台。'],['工具挂板、虎钳、机械臂工位与数控加工台。','机械臂、数控加工台与精密工具操作区。'],['双服务器机架、液冷风机柜与运维台。','服务器设备、液冷系统与运维监测。'],['双屏工作台、大屏任务席与驾驶操作席。','任务监控大屏、双屏工位与驾驶控制。']];
+const studioDescriptions=[['单床睡眠区、对坐沙发、餐桌与生活收纳。','书桌、饮水台与盆栽，围绕起居与休息布置。'],['氧气储瓶、水回收过滤罐与空气循环设备。','过滤罐组、风机柜与生命保障监测。'],['电池机架、储能罐与配电逆变设备。','双电池机架、能源监测与配电操作台。'],['成熟叶菜水培架、营养液系统与显微分析台。','分层幼苗培养架、育苗区与显微分析台。'],['诊疗床、输液架、监护仪与医疗储物。','诊疗床、无菌耗材药柜与双屏检测台。'],['工具挂板、虎钳、机械臂工位与数控加工台。','机械臂、数控加工台与精密工具操作区。'],['双服务器机架、液冷风机柜与运维台。','服务器设备、液冷系统与运维监测。'],['双屏工作台、大屏任务席与驾驶操作席。','任务监控大屏、双屏工位与驾驶控制。'],['乒乓球桌、球网与球拍，双跑步机、拉伸垫和毛巾收纳。','力量训练架、卧推凳、动感单车、哑铃架与补水收纳。'],['四人餐桌卡座、餐盘餐具、热餐配餐台与清洗回收区。','茶饮吧、交流卡座、食品储藏柜与餐具收纳。']];
 function updateStudioUI(){
  $('studioPanel').hidden=!studioMode;document.body.classList.toggle('studio-mode',studioMode);
  const profile=roomModelTypes[selectedRoom],model=moduleProfiles()[profile];
@@ -188,12 +189,13 @@ async function computeNaturalPlan(text,layout,closed){
 }
 $('scheduleForm').onsubmit=async e=>{
  e.preventDefault();if(scheduling)return;
-
+ let roomSchedulingOwned=false;
  $('scheduleStatus').classList.remove('bad');
  try{
   if(estop)throw Error('请先解除急停，再提交调度目标。');
   if(time>0&&time<duration)throw Error('当前计划尚未完成。请先播放至停靠完成，或恢复初始房间布局后提交。');
   const text=$('scheduleInput').value.trim();if(!text||text.length>600)throw Error('请输入 1–600 字的调度目标。');
+  scheduling=true;$('scheduleSubmit').disabled=true;
   if(/冯鹏|冯院长|冯老师/.test(text)){
    let intent=LunarCharacter.parse(text);
    if(!intent){
@@ -204,11 +206,15 @@ $('scheduleForm').onsubmit=async e=>{
    }
    await fengPeng.dispatch(intent);putText('scheduleStatus',intent.interpretation||'人物控制已更新');$('scheduleTargets').replaceChildren();return;
   }
-  if(fengPeng?.busy())throw Error('冯院长正在执行行程，请先停止人物任务并等待安全停靠，再调度房间。');
+  if(fengPeng){
+   roomSchedulingOwned=true;putText('scheduleStatus','正在结束人物行程；通行或搬运中的人物将在安全停靠后自动交接房间调度…');
+   await fengPeng.prepareRoomScheduling();
+   if(!fengPeng.roomScheduling||estop)throw Error('房间调度已中断，请解除急停或重新提交。');
+  }
   const initial=snapshot().layout.slice(),elevators=structuredClone(snapshot().elevators),stamp=scheduleStamp();
   scheduling=true;$('scheduleSubmit').disabled=true;putText('scheduleStatus','正在解析目标并搜索可通行的搬运路线…');
   const p=await computeNaturalPlan(text,initial,blocked());
-  if(stamp!==scheduleStamp())throw Error('计算期间场景或通道状态已变化，请重新提交指令。');
+  if(stamp!==scheduleStamp()||fengPeng&&!fengPeng.roomScheduling)throw Error('计算期间场景或通道状态已变化，请重新提交指令。');
   const tl=C.timeline(p.moves,32,elevators);
   playing=false;manualMode=false;pendingManual=false;previewMove=null;estop=false;
   naturalPlan=p;task='natural';baseLayout=initial;baseElevators=elevators;moves=p.moves;
@@ -219,7 +225,7 @@ $('scheduleForm').onsubmit=async e=>{
   putText('scheduleStatus',moves.length?`${p.summary}\n已生成 ${moves.length} 次搬运，正在自动执行。`:`目标已满足 · ${p.summary}`);
   notify(moves.length?`调度已开始 · ${moves.length} 次搬运。`:'当前布局已满足指令，目标模块已高亮。');
  }catch(error){$('scheduleStatus').classList.add('bad');putText('scheduleStatus',error.message);}
- finally{scheduling=false;$('scheduleSubmit').disabled=false;requestRender();}
+ finally{if(roomSchedulingOwned)fengPeng?.releaseRoomScheduling();scheduling=false;$('scheduleSubmit').disabled=false;requestRender();}
 };
 $('scheduleReset').onclick=()=>{$('scheduleInput').value='';$('scheduleInput').focus();};
 $('scheduleInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('scheduleForm').requestSubmit();}});
@@ -324,7 +330,7 @@ for(const event of ['pointerup','pointercancel'])renderer.domElement.addEventLis
 renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();if(roaming){const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?window.innerHeight:1);roamSpeed=Math.max(.1,Math.min(8,roamSpeed*Math.exp(-Math.max(-600,Math.min(600,delta))*.002)));notify(`漫游速度 · ${roamSpeed.toFixed(1)}×`);}else goal.distance=Math.max(110,Math.min(3100,goal.distance*Math.exp(e.deltaY*.00085)));if(!roaming)syncInput();requestRender();},{passive:false});
 let focusBefore=null;function openSettings(){held.clear();showPanel(null);focusBefore=document.activeElement;$('settings').hidden=false;$('closeSettings').focus();}function closeSettings(){$('settings').hidden=true;focusBefore?.focus();}
 $('openSettings').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('settings').onclick=e=>{if(e.target===$('settings'))closeSettings();};
-$('stop').onclick=()=>{playing=false;estop=true;pendingManual=false;audit('emergency-stop');controls();closeSettings();notify('已急停。所有建筑保持当前位置，点击“解除急停”继续。',true);};
+$('stop').onclick=()=>{playing=false;estop=true;pendingManual=false;fengPeng?.cancelRoomScheduling('已急停，房间调度已取消；解除急停后可重新提交。');audit('emergency-stop');controls();closeSettings();notify('已急停。所有建筑保持当前位置，点击“解除急停”继续。',true);};
 $('reset').onclick=()=>{const nextTask=['manual','natural'].includes(task)?'vertical':task;compile(nextTask,false);closeSettings();notify('已恢复初始建筑布局。');};
 $('block').onchange=()=>{if(task==='natural'){if($('block').checked&&time<duration&&moves.some(m=>m.nodePath.includes(C.lift(1,'C')))){$('block').checked=false;notify('当前自然语言计划使用 L2 · C 通道，请完成搬运后再封闭。',true);}else notify('通道状态已更新；后续指令使用新的通道约束。');requestRender();return;}if(manualMode){playing=false;pendingManual=false;previewMove=null;const st=snapshot();if(st.phase&&st.phase.nodePath.includes(C.lift(1,'C'))&&time<duration){$('block').checked=false;notify('当前计划使用 L2 · C 升降通道，请停靠后再封闭。',true);}controls();drawUI(snapshot());}else{compile(task,false);if(ready)notify('通道状态已更新，计划已重新验证。');}};
 $('presentation').onclick=()=>{showPanel(null);document.body.classList.add('reduced');$('exitImmersion').hidden=false;resize();};
@@ -457,5 +463,6 @@ function frame(now){
 }
 fengPeng=createFengPeng();
  window.LunarisCharacterDiagnostics=()=>fengPeng.export();
+ window.LunarisAudioDiagnostics=()=>backgroundAudio.diagnostics();
  requestRender();
 })();

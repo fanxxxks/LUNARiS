@@ -1,4 +1,4 @@
-// Detailed, reference-derived equipment for the eight room identities. This file
+// Detailed, reference-derived equipment for the room identities. This file
 // is inserted in lunar-scene's closure; all materials are lazy and shared.
 function moduleInteriorMaterials(){
  if(moduleInteriorMaterials.value)return moduleInteriorMaterials.value;
@@ -115,7 +115,7 @@ function moduleInteriorLabel(textValue,color='#c9d3cd'){
 
 function moduleDetailedInterior(inside,profile,m,p){
  const s=moduleInteriorMaterials();
- // The same shared floor serves both decks of all eight room identities.
+ // The same shared floor serves both decks of all room identities.
  // This annotation selects its photographic finish without changing openings.
  m.floor.userData.surfaceSpec={family:'interior-floor'};
  m.floor.name='interior-floor';
@@ -212,8 +212,8 @@ function moduleDetailedInterior(inside,profile,m,p){
   block(g,23,21.5,.45,0,11.5,-11.1,s.wall);block(g,22,.65,.8,0,22.1,-10.7,s.warmLED);
   for(const x of [-10.7,10.7])block(g,.5,21,.6,x,11.3,-10.75,m.seam);
   block(g,21.8,.75,1.05,0,1.4,-10.35,m.door);block(g,.075,18,.08,0,11.6,-10.83,m.seam);
-  const roles=[['REST','MESS','GALLEY'],['AIR','WATER','FILTER'],['BATTERY','THERMAL','DISTRIBUTION'],['CULTURE','NURSERY','ANALYSIS'],['CARE','PHARMACY','DIAGNOSTICS'],['BENCH','ROBOTICS','FABRICATION'],['COMPUTE','COOLING','NETWORK'],['NAVIGATION','MISSION','COMMS']];
-  label(g,moduleProfiles()[profile].code+' / '+String(variant+1).padStart(2,'0')+'|'+roles[profile][variant%3],7,-5.6,20,-10.8);
+  const roles=[['REST','MESS','GALLEY'],['AIR','WATER','FILTER'],['BATTERY','THERMAL','DISTRIBUTION'],['CULTURE','NURSERY','ANALYSIS'],['CARE','PHARMACY','DIAGNOSTICS'],['BENCH','ROBOTICS','FABRICATION'],['COMPUTE','COOLING','NETWORK'],['NAVIGATION','MISSION','COMMS'],['TABLE TENNIS','CARDIO','RECOVERY'],['DINING','GALLEY','WASH']];
+  label(g,moduleProfiles()[profile].code+' / '+String(variant+1).padStart(2,'0')+'|'+(profile===8&&variant>=3?['STRENGTH','CYCLE','FREE WEIGHTS']:profile===9&&variant>=3?['LOUNGE','TEA BAR','PANTRY']:roles[profile])[variant%3],7,-5.6,20,-10.8);
   // Separate removable wall cassettes, low voltage service ports and a raised
   // cable route keep supplies off the occupied floor and the transfer cross.
   block(g,5,1.8,.38,7.4,2.4,-10.61,m.graphite);
@@ -379,7 +379,101 @@ function moduleDetailedInterior(inside,profile,m,p){
   block(g,3.5,.4,2.5,0,9.7,3.5,s.rubber);rod(g,[0,10,3.5],[0,12.5,3.5],.12);rod(g,[0,12.5,3.5],[-.8,13,3.2],.12);disc(g,.3,.8,-.8,13.3,3.2,s.rubber,8);
   label(g,role===2?'UPLINK / COMMS':role===1?'MISSION OPS':'NAVIGATION',10,0,7.2,5.58);
  }
- const builders=[habitation,lifeSupport,power,biology,medical,workshop,dataCore,command];
+ function gym(g,role,level){
+  // Equipment stays inside its existing service bay; the central walking cross
+  // and the opposite ladder bay remain clear on both decks.
+  if(!s.tableBlue){s.tableBlue=s.worktop.clone();s.tableBlue.color.set('#236b82');s.tableBlue.roughness=.88;s.tableBlue.metalness=0;s.tableBlue.name='gym-table-matte';s.tableBlue.userData.surfaceSpec={family:'coated-alloy'};}
+  block(g,23,.18,21,0,.13,0,s.rubber);
+  function weight(q,x,y,z,r=1.2){const o=disc(q,r,.65,x,y,z,s.rubber,12);o.rotation.z=Math.PI/2;const hub=disc(q,.3,.72,x,y,z,s.steel,8);hub.rotation.z=Math.PI/2;}
+  function dumbbell(q,x,y,z,size=1){rod(q,[x-2*size,y,z],[x+2*size,y,z],.18,s.steel);for(const dx of [-1.55,1.55])weight(q,x+dx*size,y,z,.85*size);}
+  function treadmill(x){
+   const q=new T.Group();g.add(q);q.position.x=x;
+   block(q,8.4,1.1,18,0,1.15,0,m.graphite);block(q,6.5,.14,15,0,1.78,.5,s.rubber);
+   for(const xx of [-3.9,3.9]){block(q,.65,.3,16,xx,1.8,.5,s.steel);rod(q,[xx,1,-6],[xx,12,-6],.35);rod(q,[xx,10,-6],[xx,9,1.5],.28,s.rubber);}
+   for(let zz=-6;zz<8;zz+=1.2)block(q,6.2,.025,.07,0,1.87,zz,m.seam);
+   block(q,8.2,1.5,3,0,12,-6,s.rubber);screen(q,0,13,-5.8,5.5,2.7,0);block(q,.7,.3,.7,0,11.95,-4.45,s.red);
+   for(const xx of [-3.2,3.2]){disc(q,.6,.3,xx,13,-5.6,s.rubber,8);block(q,.7,.18,9,xx,1.98,1,p.paint);}
+  }
+  function bicycle(x){
+   const q=new T.Group();g.add(q);q.position.x=x;
+   for(const z of [-5,5])block(q,7,.7,1.2,0,.8,z,m.graphite);
+   rod(q,[0,1,-5],[0,7,0],.55,s.steel);rod(q,[0,7,0],[0,1,5],.55,s.steel);rod(q,[0,3,-3],[0,10,2],.48,p.paint);
+   const wheel=disc(q,3,.9,0,3.5,-3,m.graphite,20);wheel.rotation.z=Math.PI/2;weight(q,0,3.5,-3,2.6);
+   rod(q,[0,6,2],[0,10.5,2],.35);pad(q,3.6,.85,4.1,0,10.9,2,s.seat);
+   rod(q,[0,2,-5],[0,13,-5],.4);rod(q,[-3,13,-5],[3,13,-5],.3,s.rubber);screen(q,0,14.3,-5.2,3.7,2.2,1);
+   for(const sign of [-1,1]){rod(q,[sign*.9,4,0],[sign*1.8,4+sign,0],.18);block(q,1.8,.45,2,sign*2,4+sign,0,s.rubber);}
+  }
+  if(!level&&role===0){
+   // 2.74 x 1.525 m tabletop after the module's 1.25 X/Z scale; 0.76 m high.
+   block(g,21.92,.42,12.2,0,7.39,0,s.tableBlue);block(g,21.6,.7,11.9,0,6.95,0,m.graphite);
+   for(const x of [-10.82,10.82])block(g,.16,.035,12,x,7.62,0,s.worktop);
+   for(const z of [-6,6])block(g,21.7,.035,.16,0,7.62,z,s.worktop);block(g,21.7,.035,.09,0,7.62,0,s.worktop);
+   for(const x of [-7.6,7.6]){for(const z of [-4.3,4.3]){rod(g,[x,.5,z],[x,6.95,z],.34);const wheel=disc(g,.5,.42,x,.56,z,s.rubber,8);wheel.rotation.x=Math.PI/2;}rod(g,[x,2,-4.3],[x,2,4.3],.25);}
+   for(const z of [-4.3,4.3])rod(g,[-7.6,5,z],[7.6,5,z],.22);
+   // A real open net grid, with posts and pale top tape, readable from either side.
+   for(const z of [-6.5,6.5])rod(g,[0,7.3,z],[0,9.12,z],.12,m.graphite);
+   for(let z=-6.3;z<=6.3;z+=.55)rod(g,[0,7.65,z],[0,9.06,z],.018,s.worktop);
+   for(const y of [7.7,8.15,8.6,9.06])rod(g,[0,y,-6.5],[0,y,6.5],.022,s.worktop);
+   block(g,.09,.12,13,0,9.12,0,s.worktop);
+   for(const [x,z,color]of [[-7,3,s.red],[7,-3,s.rubber]]){const paddle=disc(g,.64,.13,x,7.77,z,color,14);paddle.scale.z=1.25;block(g,.3,.14,1.1,x,7.76,z+.95,s.amber);}
+   mesh(g,new T.SphereGeometry(.16,8,6),s.worktop,-5.6,7.8,2.4);label(g,'TABLE TENNIS',9,0,18,-10.78);
+  }else if(!level&&role===1){treadmill(-5.3);treadmill(5.3);label(g,'CARDIO / TREADMILL',13,0,19,-10.78);}
+  else if(level&&role===0){
+   for(const x of [-8,8]){block(g,1,21,1,x,11,-5,s.steel);block(g,1,.75,16,x,.8,0,m.graphite);for(let y=7;y<19;y+=2)block(g,.4,.4,.4,x,y,-4.35,s.rubber);}
+   rod(g,[-8,21,-5],[8,21,-5],.35,s.steel);rod(g,[-8,20,-5],[-5,20,0],.3,s.rubber);rod(g,[8,20,-5],[5,20,0],.3,s.rubber);
+   rod(g,[-10,13,-3],[10,13,-3],.24);for(const x of [-9,-7,7,9])weight(g,x,13,-3,2.1);
+   block(g,1.2,3.5,11,0,2.6,2,m.graphite);pad(g,5.2,1.2,12,0,4.7,2,s.seat);for(const z of [-3,7])block(g,6,.65,1,0,1,z,s.steel);
+   label(g,'STRENGTH / RACK',13,0,23,-10.7);
+  }else if(level&&role===1){bicycle(-5.3);bicycle(5.3);label(g,'CYCLE / ENDURANCE',13,0,20,-10.78);}
+  else{
+   cabinet(g,-7,-7,6,18,5,3);label(g,'TOWELS',4.5,-7,16,-4.29);bottles(g,-8,-6,2,19.5);
+   if(level){for(const y of [3,7,11]){block(g,12,.45,4,3,y,-5,m.graphite);for(const x of [-1,3,7])dumbbell(g,x,y+1,-5,.75+(y/30));}for(const x of [-3,9])rod(g,[x,.5,-5],[x,12,-5],.3);}
+   else{for(const x of [-4,5]){pad(g,6.2,.35,13,x,.6,2,s.seat);for(const z of [-2,4])block(g,5.5,.04,.08,x,.8,z,s.linen);}disc(g,1,4,8,3,-7,s.blanket,12);}
+   screen(g,2,18,-10.5,10,5,1);label(g,level?'FREE WEIGHTS':'MOBILITY / RECOVERY',12,0,23,-10.7);
+  }
+ }
+ function dining(g,role,level){
+  // Furniture stays in the three existing bays, clear of hatches and ladders.
+  function mug(x,y,z){disc(g,.64,1.15,x,y+.57,z,s.porcelain,12);disc(g,.5,.035,x,y+1.16,z,s.soil,12);const handle=mesh(g,new T.TorusGeometry(.43,.12,6,10),s.porcelain,x+.7,y+.6,z);handle.rotation.y=Math.PI/2;}
+  function placeSetting(x,z){
+   pad(g,4.7,.12,5.8,x,7.95,z,s.rubber);disc(g,1.65,.16,x,8.1,z,s.porcelain,16);disc(g,1.34,.08,x,8.22,z,s.linen,16);
+   for(const dx of [-.5,.45]){const food=mesh(g,new T.SphereGeometry(.5,8,6),s.amber,x+dx,8.4,z);food.scale.set(1,.45,1.3);}
+   for(const dx of [-2,2]){rod(g,[x+dx,8.08,z-1.4],[x+dx,8.08,z+.9],.075,s.steel);if(dx<0)for(const offset of [-.15,0,.15])rod(g,[x+dx+offset,8.08,z+.7],[x+dx+offset,8.08,z+1.3],.035,s.steel);}
+   mug(x+1.3,8.02,z-2);
+  }
+  if(role===0){
+   for(const x of [-8,8]){block(g,5.7,3.4,17,x,2.1,0,m.graphite);pad(g,5.8,1.25,17,x,4.45,0,s.seat);pad(g,1.4,7.8,17,x+(x<0?-2.2:2.2),7.4,0,s.blanket);for(const z of [-4.3,4.3])pad(g,4.5,.25,7,x,5.2,z,s.linen);}
+   pad(g,9.8,.7,17,0,7.55,0,s.worktop);for(const z of [-5,5]){block(g,1,6,1,0,4,z,s.steel);block(g,6,.35,3,0,.8,z,m.graphite);}
+   if(!level)for(const x of [-2.5,2.5])for(const z of [-4.2,4.2])placeSetting(x,z);
+   else{for(const z of [-4,4]){mug(-2,7.95,z);mug(2,7.95,z);}planter(g,0,7.95,0,.55);checklist(g,0,7.98,5.4,.1);}
+   block(g,20,.3,1,0,18,-10.35,s.warmLED);label(g,level?'CREW LOUNGE':'CREW DINING',12,0,16,-10.72);
+  }else if(role===1){
+   cabinet(g,-6.4,-6,8,9,8,2);cabinet(g,4.6,-6,12,9,8,3);block(g,22,.7,8.5,0,10,-6,s.worktop);
+   if(!level){
+    for(const x of [-6,0,6]){block(g,5.2,.4,5.7,x,10.6,-5.4,s.steel);block(g,4.5,.18,4.8,x,10.83,-5.4,s.rubber);for(const z of [-6.6,-4.5]){disc(g,1.65,.9,x,11.25,z,s.porcelain,12);disc(g,1.4,.12,x,11.75,z,s.amber,12);}}
+    block(g,21,1.4,6,0,19,-6,s.grille);block(g,19,.12,4.5,0,18.2,-5.8,s.warmLED);
+    cabinet(g,-6,6,9,6.3,5,2);block(g,10,.5,5.5,-6,7,6,s.worktop);for(let i=0;i<4;i++)pad(g,7,.17,4,-6,7.4+i*.25,6,s.steel);
+    label(g,'HOT MEALS / SERVE',14,0,16,-10.7);
+   }else{
+    block(g,6.2,6.6,5.7,-6.2,13.7,-6.6,s.rubber);screen(g,-6.2,14.7,-3.68,4,2.5,1);for(const x of [-7.4,-5]){rod(g,[x,12.3,-3.5],[x,11.6,-3.5],.18,s.steel);mug(x,10.4,-2.8);}
+    disc(g,1.75,3.3,5,12.1,-5.7,s.porcelain,14);disc(g,1.8,.35,5,13.9,-5.7,s.steel,14);rod(g,[6.4,12.6,-5.7],[7.6,13.2,-5.7],.24,s.steel);
+    for(const x of [0,3,6,9]){block(g,2.2,3.6,2.8,x,16.8,-9,p.cabinet);label(g,'TEA',1.6,x,16.8,-7.54);}
+    block(g,12,.4,3.7,4.5,14.7,-8.9,s.worktop);for(const x of [-7,0,7]){pad(g,4,.8,4,x,5.2,4,s.seat);rod(g,[x,.7,4],[x,4.8,4],.35);disc(g,2.5,.4,x,.7,4,m.graphite,12);}
+    label(g,'TEA / COFFEE / WATER',16,0,21,-10.7);
+   }
+  }else if(!level){
+   cabinet(g,0,-5,21,9,9,4);block(g,22,.7,9.5,0,10,-5,s.worktop);
+   for(const x of [-5,5]){block(g,7.6,.22,6.6,x,10.47,-5,s.steel);block(g,6.5,.18,5.5,x,10.62,-5,s.rubber);rod(g,[x,10.7,-8],[x,14.8,-8],.2);rod(g,[x,14.8,-8],[x,14.8,-5.8],.2);rod(g,[x,14.8,-5.8],[x,14,-5.8],.2);}
+   for(const x of [-7,0,7]){block(g,5.2,6,5.7,x,3.4,5,p.cabinet);block(g,5.5,.4,6,x,6.6,5,s.steel);block(g,3,.2,2.6,x,6.86,5,s.rubber);label(g,x<0?'TRAYS':x>0?'RECYCLE':'WASTE',3.8,x,4,7.9);}
+   block(g,19,.4,3.4,0,17,-9,s.worktop);for(const x of [-6,0,6])for(let i=0;i<4;i++)disc(g,1.6,.22,x,17.45+i*.25,-8.9,s.porcelain,12);label(g,'WASH / RETURN',13,0,21,-10.7);
+  }else{
+   cabinet(g,-6.4,-6,8,20,8,4);label(g,'CHILLED',5,-6.4,17,-1.9);block(g,.4,6,.4,-3.5,10,-1.7,s.steel);
+   for(const x of [.2,9.5])rod(g,[x,.6,-7],[x,21,-7],.3,s.steel);
+   for(const y of [2.5,8,13.5,19]){block(g,10,.45,6,5,y,-7,s.worktop);for(const x of [2,5,8]){block(g,2.4,3.7,4,x,y+2.1,-7,p.cabinet);label(g,'FOOD',1.8,x,y+2,-4.94);}}
+   cabinet(g,0,5,17,7,6,3);label(g,'DRY STORE / CROCKERY',14,0,23,-10.7);
+  }
+ }
+ const builders=[habitation,lifeSupport,power,biology,medical,workshop,dataCore,command,gym,dining];
  for(let level=0;level<2;level++){
   const y=level?43:14,deckGroup=new T.Group();deckGroup.userData.deck=level?'upper':'lower';inside.add(deckGroup);
   for(const [x,z,role]of [[-25,23,0],[25,23,1],[-25,-23,2]]){

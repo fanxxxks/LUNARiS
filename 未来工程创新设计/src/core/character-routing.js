@@ -2,40 +2,50 @@
 (function(root){
 'use strict';
 const C=typeof module==='object'&&module.exports?require('./simulation.js'):root.LunarCore;
-const profiles=['居住舱','生命支持舱','能源舱','生物培养舱','医疗舱','工程工坊','数据核心舱','指挥舱'];
-const modelTypes=C.roomTypes.map(t=>[5,3,0,2,5,7][t]);modelTypes[13]=1;modelTypes[19]=4;modelTypes[11]=6;
+const profiles=['居住舱','生命支持舱','能源舱','生物培养舱','医疗舱','工程工坊','数据核心舱','指挥舱','健身房','餐厅'];
+const modelTypes=C.roomTypes.map(t=>[5,3,0,2,5,7][t]);modelTypes[13]=1;modelTypes[19]=4;modelTypes[11]=6;modelTypes[22]=8;modelTypes[18]=9;
 const activityNames=[
- ['短暂休息','睡眠恢复','享用餐食','补充饮水','整理个人物品','回顾个人日程'],
+ ['短暂休息','睡眠恢复','安静阅读','补充饮水','整理个人物品','回顾个人日程'],
  ['查看空气循环','检查供氧读数','查看水处理','巡检过滤设备','复核环境记录'],
  ['查看电池余量','核对配电负载','巡检热控','检查备用电源记录','评估实验用能'],
  ['观察植株','检查幼苗','查看培养环境','检查营养液记录','登记样本','复核培养进展'],
  ['例行健康自查','查看体征记录','复核体检日程','盘点医疗耗材','查看恢复建议'],
  ['检查工具','查看加工任务','检查装配件','巡视机器人工作台','复核维修记录','核查材料样件'],
  ['分析实验数据','检查计算任务','核对备份记录','查看网络状态','巡检机柜冷却','整理任务资料'],
- ['查看任务简报','安排当日工作','查看导航信息','检查通信链路','汇报研究进展','复盘任务']
+ ['查看任务简报','安排当日工作','查看导航信息','检查通信链路','汇报研究进展','复盘任务'],
+ ['乒乓球热身准备','查看力量训练计划','熟悉跑步机','查看单车训练设置','规划拉伸放松','检查哑铃收纳'],
+ ['享用早餐','午间用餐','晚餐放松','泡茶小憩','餐后整理','查看食品储藏']
 ];
-const reasons=[['工作一阵了，休息一下','补充精力再开始下一项工作','该吃点东西了','先喝点水','整理好随身物品','看看接下来的安排'],['该检查空气循环了','确认一下供氧读数','看看水处理记录','定期检查过滤设备','复核今天的环境记录'],['确认下一项任务的供电余量','查看各回路负载','检查热控设备状态','复核备用电源记录','评估实验的用能安排'],['看看植株的生长情况','去观察幼苗','核对培养环境记录','看看营养液记录','记录今天的样本','复核培养进展'],['安排一次例行自查','看看自己的体征记录','确认体检安排','清点医疗耗材记录','回顾健康恢复建议'],['确认工具齐备','看看加工任务进度','检查装配件记录','巡视机器人工作台','复核维修记录','看看材料样件'],['整理样本并分析数据','查看计算任务进度','确认备份记录','检查网络状态','巡视机柜冷却','整理今天的任务资料'],['查看今天的任务简报','安排下一阶段工作','复核导航信息','检查通信链路','汇报最新研究进展','复盘已完成的任务']];
-const activities=activityNames.flatMap((names,profile)=>names.map((name,i)=>({id:`${profile}:${i}`,profile,name,reason:reasons[profile][i],role:i%3,deck:i%2?'upper':'lower',seconds:12+(i%4)*5,cooldown:180+i*20,next:profile===3&&i===4?'6:0':profile===6&&i===0?'7:4':null})));
+const reasons=[['工作一阵了，休息一下','补充精力再开始下一项工作','想安静读一会儿书','先喝点水','整理好随身物品','看看接下来的安排'],['该检查空气循环了','确认一下供氧读数','看看水处理记录','定期检查过滤设备','复核今天的环境记录'],['确认下一项任务的供电余量','查看各回路负载','检查热控设备状态','复核备用电源记录','评估实验的用能安排'],['看看植株的生长情况','去观察幼苗','核对培养环境记录','看看营养液记录','记录今天的样本','复核培养进展'],['安排一次例行自查','看看自己的体征记录','确认体检安排','清点医疗耗材记录','回顾健康恢复建议'],['确认工具齐备','看看加工任务进度','检查装配件记录','巡视机器人工作台','复核维修记录','看看材料样件'],['整理样本并分析数据','查看计算任务进度','确认备份记录','检查网络状态','巡视机柜冷却','整理今天的任务资料'],['查看今天的任务简报','安排下一阶段工作','复核导航信息','检查通信链路','汇报最新研究进展','复盘已完成的任务'],['想换换心情，去球台边做点热身准备','把力量训练安排得循序渐进','先熟悉跑步机的控制和停机按钮','看看适合自己的单车训练设置','久坐之后想安排一点拉伸','看看哑铃如何分类收纳'],['吃点早餐再开始今天的工作','工作告一段落，想吃顿热饭','想在晚餐时间慢下来','想泡杯茶，缓一缓紧绷的思绪','用完餐想把餐具归置好','想熟悉食品和餐具的存放位置']];
+const activities=activityNames.flatMap((names,profile)=>names.map((name,i)=>({id:`${profile}:${i}`,profile,name,reason:reasons[profile][i],role:profile===9?([0,0,0,1,2,2][i]):i%3,deck:profile===9?(i===3||i===5?'upper':'lower'):i%2?'upper':'lower',seconds:12+(i%4)*5,cooldown:180+i*20,next:profile===3&&i===4?'6:0':profile===6&&i===0?'7:4':null})));
 const personalThoughts=[
- ['一直惦记着工作，肩膀都有点僵了。想回去靠一会儿，让自己放松下来。','想好好睡一觉，养足精神再处理那些需要动脑筋的事情。','有点想念热乎的饭菜了。先去吃点东西，工作也得有精神才行。','说了这么久，想喝杯水润润嗓子，顺便歇一歇。','东西放得顺手，做事才不会手忙脚乱。想把自己的物品整理一下。','事情一多就容易顾此失彼。想找个安静地方，把接下来的安排理清楚。'],
+ ['一直惦记着工作，肩膀都有点僵了。想回去靠一会儿，让自己放松下来。','想好好睡一觉，养足精神再处理那些需要动脑筋的事情。','想暂时放下手头的工作，回起居区安静读几页书，让思绪缓一缓。','说了这么久，想喝杯水润润嗓子，顺便歇一歇。','东西放得顺手，做事才不会手忙脚乱。想把自己的物品整理一下。','事情一多就容易顾此失彼。想找个安静地方，把接下来的安排理清楚。'],
  ['大家都要在这里生活很久，我想亲自看看空气循环设备，心里更踏实些。','想去看看供氧记录，弄明白这套系统平时是怎样维持稳定的。','每天用的水是怎么循环回来的？想再去水处理区仔细看看。','过滤设备平时不显眼，却少不了它。想花点时间做一次例行观察。','想把今天的环境记录梳理一下，看看有没有值得继续关注的变化。'],
  ['后面还有实验要安排，想先看看电池余量，做计划时心里有数。','想弄清各个设备的用电情况，看看任务安排还有没有协调的余地。','设备散热这件事不能只看表面。想去热控区看看平时的运行记录。','备用方案平时也得熟悉。想再翻翻备用电源的检查记录。','实验想法不少，得先想清楚要用多少电。去能源舱核对一下更合适。'],
  ['在月球上看到绿色总让人心情好些。想去看看那些植株长得怎么样。','我一直惦记着那几盘幼苗，想凑近看看新叶子有没有变化。','想弄明白温度和湿度对培养有什么影响，去看看环境记录。','养好这些植物可不只是浇水。想研究一下营养液的配比记录。','观察到的细节不记下来，很快就忘了。想把样本逐一看清楚、登记好。','想把最近几次培养记录放在一起看，也许能找到下一步研究的线索。'],
  ['忙起来就容易忽略自己，想抽点时间做个例行健康自查。','想认真看看自己的体征记录，了解休息和工作节奏是否合适。','不想让体检和实验安排撞在一起，去把日程确认清楚。','医疗用品需要时得找得到。想熟悉一下耗材清单和存放位置。','工作要紧，也得学会恢复精力。想看看有哪些适合自己的休息建议。'],
  ['想动手做点东西，先去看看工具是否齐备、放在哪里。','惦记着那项加工任务，想去工坊看看进展，想想后面怎么衔接。','图纸上的东西变成实物是什么样？想近距离看看装配件。','机器人做精细操作挺有意思，想去工作台旁观察一下。','以前的维修经验可能帮得上忙，想翻翻记录，把容易忽略的地方记住。','脑子里有个材料方面的想法，想对照样件看一看，能不能找到线索。'],
  ['样本看过了，我想把数据放在一起比较，弄清这些现象之间有没有联系。','一直惦记着计算结果，想去看看任务进度，好安排下一步。','资料攒了不少，想确认备份记录，免得以后找不到研究过程。','想了解各舱之间的数据怎么传递，去网络运维台看看。','算得快也要散得了热。想看看机柜冷却的记录，了解设备的工作条件。','零散的资料越来越多，想把它们整理成以后能直接查阅的笔记。'],
- ['想先弄明白今天最重要的事情，看看任务简报再开始忙。','大家的工作得衔接起来。我想把今天的任务排一排，留出沟通的时间。','想看看基地的位置和导航信息，把周围的空间关系再熟悉一下。','想熟悉一下通信联络的安排，等需要沟通时就不用临时翻找。','有些研究进展想讲清楚，去指挥舱整理一下要汇报的重点。','事情做完也值得回头想想。我想复盘一下，看看下次能不能做得更顺。']
+ ['想先弄明白今天最重要的事情，看看任务简报再开始忙。','大家的工作得衔接起来。我想把今天的任务排一排，留出沟通的时间。','想看看基地的位置和导航信息，把周围的空间关系再熟悉一下。','想熟悉一下通信联络的安排，等需要沟通时就不用临时翻找。','有些研究进展想讲清楚，去指挥舱整理一下要汇报的重点。','事情做完也值得回头想想。我想复盘一下，看看下次能不能做得更顺。'],
+ ['盯着数据太久了，想去乒乓球台边换换心情，先活动一下肩膀和手腕。','想让身体也保持状态。去看看力量训练区，给自己安排一个循序渐进的计划。','想走动走动，让脑子放松一下。先去熟悉跑步机的控制和停机按钮。','今天想试试换一种运动节奏，去看看单车的座位和阻力设置。','坐久了腰背有点发紧，想找块垫子，给自己安排一点舒展身体的时间。','做事和锻炼都得有条理。去看看不同哑铃的摆放，想想自己适合从哪里开始。'],
+ ['早上想吃点热乎的东西，再从容地开始今天的工作。去餐厅看看早餐，给自己留点用餐时间。','忙到现在有点饿了，想放下手头的事情去餐厅吃顿饭，吃好了再回来继续研究。','今天想在晚餐时慢下来，找个舒服的位置，认真吃饭，也回想一下今天有趣的事情。','想念一杯热茶的香气了。去茶饮吧泡杯茶，暂时不想任务，让脑子放松一下。','用过的餐具不能留给别人收拾。想去清洗区归还餐盘，把桌面也整理干净。','想熟悉一下食品储藏柜，看看餐具和食品放在哪里，下次准备餐食就不用到处找了。']
 ];
 function activityThought(a){return personalThoughts[a.profile][Number(a.id.split(':')[1])];}
 function visitThought(visit){
  if(visit.action==='wave')return '到了先挥挥手打个招呼，再留点时间看看周围，不必来去都那么匆忙。';
  if(visit.action==='push')return '想过去试试推行动作，留意自己的站位和手边有没有足够的空间。';
- const interests=['感受一下起居空间，找个舒服的地方歇一会儿','了解一下空气和水是怎样循环利用的','看看能源设备，熟悉供电和散热的安排','看看绿植和样本，留意那些容易错过的小变化','熟悉一下诊疗区，看看健康检查的安排','近距离看看工具和加工设备，找点动手的灵感','看看计算和数据设备，梳理一下手头的资料','看看任务安排，把接下来的工作想清楚'];
+ const interests=['感受一下起居空间，找个舒服的地方歇一会儿','了解一下空气和水是怎样循环利用的','看看能源设备，熟悉供电和散热的安排','看看绿植和样本，留意那些容易错过的小变化','熟悉一下诊疗区，看看健康检查的安排','近距离看看工具和加工设备，找点动手的灵感','看看计算和数据设备，梳理一下手头的资料','看看任务安排，把接下来的工作想清楚','看看乒乓球桌和健身器材，给自己安排一点运动和放松','吃顿热乎的饭，慢慢享受用餐时间，也让自己恢复一点精神'];
  return `既然安排了这次到访，我想${interests[modelTypes[visit.room-1]]}。`;
 }
 const roomLabel=r=>`R${String(r+1).padStart(2,'0')} ${profiles[modelTypes[r]]}`;
 const nodePosition=(layout,r)=>C.slots[layout.indexOf(r)];
 const foot=deck=>deck==='upper'?43.08:14.08;
+// A stopped person must be on a cabin deck, clear of the inter-room gaps.
+function safeRoomPosition(position){
+ return Array.isArray(position)&&position.length===3&&position.every(Number.isFinite)&&
+  [foot('lower'),foot('upper')].some(y=>Math.abs(position[1]-y)<.1)&&
+  Math.abs(position[0])<C.config.width/2-2&&Math.abs(position[2])<C.config.depth/2-2;
+}
 function activityPoint(a){return {position:[0,foot(a?.deck),a?.role===2?-28.75:28.75],yaw:a?.role===1?Math.PI/2:-Math.PI/2};}
 const length=(a,b)=>Math.hypot(...a.map((v,k)=>v-b[k]));
 function walk(layout,from,to,options={}){
@@ -80,9 +90,9 @@ function parse(text){
  if(/继续|恢复/.test(text)&&!/[Rr]\s*\d/.test(text))return validateIntent({kind:'character_itinerary',command:'resume'});
  if(/停止|取消/.test(text))return validateIntent({kind:'character_itinerary',command:'stop'});
  if(/自主|自由活动/.test(text))return validateIntent({kind:'character_itinerary',command:/关闭|不要/.test(text)?'auto_off':'auto_on'});
- const re=/[Rr]\s*0*(\d{1,3})|居住(?:舱|单元)?|生命支持舱?|能源舱?|生物培养舱?|医疗舱?|工程工坊|数据核心舱?|指挥舱?/g;
- const matches=[...text.matchAll(re)];if(!matches.length)return null;
- const visits=matches.map((m,i)=>{let room;if(m[1])room=Number(m[1]);else{const p=profiles.findIndex(n=>n.startsWith(m[0].replace('单元',''))||m[0].startsWith(n));const ids=modelTypes.flatMap((t,r)=>t===p?[r+1]:[]);if(ids.length!==1)throw Error(`“${m[0]}”对应 ${ids.map(r=>'R'+String(r).padStart(2,'0')).join('、')}，请指定房间编号。`);room=ids[0];}
+ const re=/[Rr]\s*0*(\d{1,3})|居住(?:舱|单元)?|生命支持舱?|能源舱?|生物培养舱?|医疗舱?|工程工坊|数据核心舱?|指挥舱?|健身房|健身舱|餐厅|食堂|餐饮舱/g;
+ const matches=[...text.matchAll(re)];if(!matches.length){const meal=text.match(/吃饭|用餐/);if(!meal)return null;matches.push(meal);}
+ const visits=matches.map((m,i)=>{let room;if(m[1])room=Number(m[1]);else{const title=m[0]==='健身舱'?'健身房':['食堂','餐饮舱','吃饭','用餐'].includes(m[0])?'餐厅':m[0];const p=profiles.findIndex(n=>n.startsWith(title.replace('单元',''))||title.startsWith(n));const ids=modelTypes.flatMap((t,r)=>t===p?[r+1]:[]);if(ids.length!==1)throw Error(`“${m[0]}”对应 ${ids.map(r=>'R'+String(r).padStart(2,'0')).join('、')}，请指定房间编号。`);room=ids[0];}
   const suffix=text.slice(m.index+m[0].length,matches[i+1]?.index??text.length),seconds=suffix.match(/(?:停留|等待|休息|待机)\s*(\d+(?:\.\d+)?)\s*(秒|分钟|分)/);return {room,seconds:seconds?Number(seconds[1])*(seconds[2]==='秒'?1:60):8,action:/挥手/.test(suffix)?'wave':/推/.test(suffix)?'push':'idle',deck:/上层/.test(suffix)?'upper':'lower'};});
  return validateIntent({kind:'character_itinerary',visits,speed:/跑/.test(text)?'run':'walk'});
 }
@@ -138,6 +148,6 @@ function plan(request){
  close.sort((a,b)=>a.route.walkMetres-b.route.walkMetres||a.moves.length-b.moves.length||a.total-b.total);
  const answer=close[0];return {...answer,plannedFrom:layout.slice(),search:{expanded,candidates:evaluated.length,fastest,tolerance,scope:'限时搜索中的最优候选'},estimatedSeconds:answer.total};
 }
-const api={profiles,modelTypes,activities,activityThought,visitThought,roomLabel,activityPoint,walk,parse,validateIntent,chooseActivity,requiresTransport,plan};
+const api={profiles,modelTypes,activities,activityThought,visitThought,roomLabel,activityPoint,safeRoomPosition,walk,parse,validateIntent,chooseActivity,requiresTransport,plan};
 if(typeof module==='object'&&module.exports)module.exports=api;else root.LunarCharacter=api;
 })(typeof globalThis==='object'?globalThis:this);

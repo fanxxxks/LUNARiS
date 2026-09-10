@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "room": 23,
+  "profile": "GYM",
+  "plan": {
+    "destination": 22,
+    "estimatedSeconds": 120.39152644230768,
+    "walkMetres": 76.275,
+    "moves": 2,
+    "search": {
+      "expanded": 1422,
+      "candidates": 1011,
+      "fastest": 120.39152644230768,
+      "tolerance": 2,
+      "scope": "限时搜索中的最优候选"
+    }
+  }
+}

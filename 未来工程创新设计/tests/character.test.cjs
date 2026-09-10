@@ -1,6 +1,10 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const C=require('../src/core/simulation.js'),P=require('../src/core/character-routing.js');
+test('safe stop accepts both cabin decks and rejects ladders, gaps and invalid positions',()=>{
+ for(const position of [[0,14.08,28.75],[0,43.08,-28.75],[30,43.08,-28.75]])assert.equal(P.safeRoomPosition(position),true);
+ for(const position of [[0,26,0],[C.config.width/2+1,14.08,0],[0,14.08,C.config.depth/2+1],[NaN,14.08,0],null])assert.equal(P.safeRoomPosition(position),false);
+});
 test('three names preserve ordered and repeated visits, waits and actions',()=>{
  for(const name of ['冯鹏','冯院长','冯老师']){
   const r=P.parse(`${name}先去 R14 停留 5 秒，再去 R20 停留 2 分钟并挥手，最后回 R14`);
@@ -10,7 +14,7 @@ test('three names preserve ordered and repeated visits, waits and actions',()=>{
 });
 test('all room identities have distinct activities, goals and cooldowns',()=>{
  assert.equal(new Set(P.activities.map(a=>a.id)).size,P.activities.length);assert.ok(P.activities.length>=40);
- for(let p=0;p<8;p++){assert.ok(P.activities.filter(a=>a.profile===p).length>=5);assert.ok(P.modelTypes.includes(p));}
+ for(let p=0;p<P.profiles.length;p++){assert.ok(P.activities.filter(a=>a.profile===p).length>=5);assert.ok(P.modelTypes.includes(p));}
  const completed=Object.fromEntries(P.activities.map(a=>[a.id,100]));assert.equal(P.chooseActivity({completed,profileAt:{},fatigue:0},101,()=>0),null);
 });
 test('walking follows occupied room links and climbing changes floor without teleporting',()=>{
@@ -46,10 +50,10 @@ test('after a walking trip, autonomous needs prefer an unconnected destination t
  const a=P.chooseActivity(state,100,()=>.5,C.initial);
  assert.ok(P.modelTypes.some((type,r)=>type===a.profile&&r!==state.room&&!P.walk(C.initial,state.room,r)));
 });
-test('autonomous demand visits all eight types without immediately repeating activities',()=>{
+test('autonomous demand visits all room types without immediately repeating activities',()=>{
  const state={completed:{},profileAt:{},fatigue:0},types=new Set();let last=null;
  for(let now=30;now<=1200;now+=50){const a=P.chooseActivity(state,now,()=>.5);assert.ok(a);assert.notEqual(a.id,last);last=a.id;state.completed[a.id]=now;state.profileAt[a.profile]=now;types.add(a.profile);}
- assert.equal(types.size,8);
+ assert.equal(types.size,P.profiles.length);
 });
 test('model-backed character interpretation uses visible room identities and validates output',async()=>{
  const savedFetch=global.fetch,savedKey=process.env.LUNARIS_API_KEY;process.env.LUNARIS_API_KEY='local-test-placeholder';
@@ -60,4 +64,23 @@ test('model-backed character interpretation uses visible room identities and val
   assert.equal(result.visits[0].room,20);assert.match(request.messages[0].content,/人物行程/);const scene=JSON.parse(request.messages[1].content).scene;
   assert.equal(scene.rooms.find(r=>r.id===20).visibleProfile,'医疗舱');
  }finally{global.fetch=savedFetch;if(savedKey===undefined)delete process.env.LUNARIS_API_KEY;else process.env.LUNARIS_API_KEY=savedKey;}
+});
+
+
+test('gym identity resolves from both names and supplies useful autonomous needs',()=>{
+ for(const word of ['健身房','健身舱'])assert.equal(P.parse('冯院长去'+word).visits[0].room,23);
+ assert.equal(P.roomLabel(22),'R23 健身房');const needs=P.activities.filter(a=>a.profile===8);assert.equal(needs.length,6);
+ for(const a of needs)assert.ok(P.activityThought(a).length>20);
+ assert.match(P.visitThought({room:23,action:'idle'}),/乒乓球/);
+});
+
+
+test('dining names and eating requests preserve duration and explicit itinerary order',()=>{
+ for(const word of ['餐厅','食堂','餐饮舱','吃饭','用餐']){
+  const visit=P.parse('冯院长去'+word+'停留 2 分钟').visits[0];assert.equal(visit.room,19);assert.equal(visit.seconds,120);
+ }
+ assert.deepEqual(P.parse('冯老师先去健身房，再去餐厅吃饭，最后回 R15').visits.map(v=>v.room),[23,19,15]);
+ const meals=P.activities.filter(a=>a.profile===9);assert.equal(meals.length,6);
+ assert.ok(meals.every(a=>P.activityThought(a).length>20));assert.equal(P.roomLabel(18),'R19 餐厅');
+ assert.ok(meals.filter(a=>/早餐|用餐|晚餐/.test(a.name)).every(a=>a.deck==='lower'&&a.role===0));
 });

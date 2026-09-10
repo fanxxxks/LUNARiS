@@ -1,0 +1,21 @@
+{
+  "initial": {
+    "duration": 197.986667,
+    "volume": 0.18,
+    "loop": true,
+    "embedded": true
+  },
+  "signal": 0.1104731559753418,
+  "errors": [],
+  "checks": [
+    "offline embedded song",
+    "first gesture playback",
+    "real music signal",
+    "end-of-track loop",
+    "independent volume",
+    "global mute and resume",
+    "sound recovery preserves song position",
+    "background pause and resume",
+    "persisted music toggle and volume"
+  ]
+}

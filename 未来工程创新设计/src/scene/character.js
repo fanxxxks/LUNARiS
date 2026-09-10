@@ -13,6 +13,7 @@ function createFengPeng(){
  const state={loaded:false,visible:true,highlight:true,walkOnlyTrips:0,paused:false,auto:true,follow:false,status:'载入角色',thought:'正在整理行装…',room:selectedRoom,position:[0,14.08,0],yaw:0,idle:0,clock:0,fatigue:0,completed:{},profileAt:{},failed:{},visits:[],index:0,history:[],progress:0,plan:null};
  let mixer,clips={},currentAction=null,hips,hipOrigin,model,groundOffset=0,loadError=null,planning=false,worker=null,generation=0,route=null,piece=0,pieceTime=0,activity=null,activityTime=0,transfer=null,pending=null,nextActivity=null,uiClock=0,previousView=null;
  let actionName='idle';
+ let cancelWorker=null,roomReservation=false,roomHandoff=null;
  const snapshotExport=()=>({portrait:portrait.export(),name:'冯院长',room:state.room,position:state.position.slice(),status:state.status,thought:state.thought,visible:group.visible,highlighted:group.visible&&state.highlight,walkOnlyTrips:state.walkOnlyTrips,view:{follow:state.follow,name:viewName,floor:visibleFloor,section:sectionMode,visibleRooms:rooms.filter(r=>r.userData.visible).length},paused:state.paused,autonomous:state.auto,visits:structuredClone(state.visits),index:state.index,history:structuredClone(state.history),plan:state.plan,needs:{fatigue:state.fatigue,completed:{...state.completed}}});
  function log(event,detail={}){state.history.push({event,at:state.clock,...detail});if(state.history.length>160)state.history.shift();}
  function showThought(text){state.thought=text;uiClock=1;requestRender();}
@@ -60,17 +61,34 @@ function createFengPeng(){
  },e=>{loadError=e;state.status='角色载入失败';showThought('角色素材无法读取，请重新构建项目。');});
  function currentLayout(){return snapshot().layout.slice();}
  function busy(){return planning||!!transfer||!!route||!!activity||state.visits.length>0;}
- function stopWorker(){generation++;if(worker){worker.terminate();worker=null;}planning=false;}
- function clearTask(){stopWorker();route=null;activity=null;state.visits=[];state.index=0;state.progress=0;nextActivity=null;state.idle=0;state.status='待机';animate('idle');}
+ function stopWorker(){generation++;cancelWorker?.();if(worker){worker.terminate();worker=null;}planning=false;}
+ function settleRoomHandoff(error){const waiter=roomHandoff;roomHandoff=null;if(waiter){if(error)waiter.reject(Error(error));else waiter.resolve();}}
+ function cancelRoomScheduling(message='房间调度已取消，请重新提交。'){roomReservation=false;settleRoomHandoff(message);}
+ function releaseRoomScheduling(){roomReservation=false;}
+ function clearTask(){stopWorker();route=null;activity=null;pending=null;state.visits=[];state.index=0;state.progress=0;state.plan=null;nextActivity=null;state.idle=0;state.status='待机';animate('idle');if(!transfer)settleRoomHandoff();}
+ function safeToStop(){return !transfer&&D.safeRoomPosition(state.position)&&!(route&&route.pieces[piece]?.kind==='climb'&&pieceTime>0);}
+ function requestSafeStop(){
+  state.paused=false;
+  if(transfer||route&&!safeToStop()){pending={command:'stop'};state.status='等待安全停靠';showThought('正在结束当前通行或搬运，到达安全位置后立即停止。');}
+  else{clearTask();showThought('已停止人物行程，可以调度房间。');}
+  ui();requestRender();
+ }
+ function prepareRoomScheduling(){
+  if(estop)return Promise.reject(Error('请先解除急停，再提交调度目标。'));
+  roomReservation=true;
+  return new Promise((resolve,reject)=>{roomHandoff={resolve,reject};requestSafeStop();});
+ }
  function control(command){
-  if(command==='pause'){state.paused=true;showThought('先缓一缓，给自己一点时间想清楚接下来要做的事。');return;}
+  if(roomReservation&&['resume','auto_on'].includes(command)){showThought('正在交接或执行房间调度，请等待本次调度完成。');return;}
+  if(command==='pause'){if(roomReservation)cancelRoomScheduling('人物已暂停，房间调度已取消。重新提交后将继续安全停靠。');state.paused=true;showThought('先缓一缓，给自己一点时间想清楚接下来要做的事。');ui();return;}
   if(command==='resume'){state.paused=false;showThought(state.visits[state.index]?D.visitThought(state.visits[state.index]):'歇过一会儿了，接着把想做的事情做好。');return;}
   if(command==='auto_on'){state.auto=true;state.paused=false;state.idle=0;showThought('接下来自己安排一会儿。既想看看研究进展，也想照顾好日常生活。');return;}
   if(command==='auto_off'){state.auto=false;showThought('先把眼前这件事做好，之后就安心歇一会儿，等新的安排。');return;}
-  if(command==='stop'){state.auto=false;state.paused=false;if(transfer||route){pending={command:'stop'};showThought('先不赶下一件事了，等稳稳停下来，给自己留点休息的时间。');}else{clearTask();showThought('暂时没有要赶的事，正好停下来整理一下思路。');}}
+  if(command==='stop'){state.auto=false;requestSafeStop();}
  }
  async function dispatch(intent){
   const v=D.validateIntent(intent);if(v.command!=='go'){control(v.command);ui();return;}
+  if(roomReservation)throw Error('正在交接或执行房间调度，请稍后再安排行程。');
   if(!state.loaded)throw Error(loadError?'角色加载失败，请刷新重试。':'角色正在载入，请稍候。');
   if(estop)throw Error('请先解除急停。');if(playing||time>0&&time<duration)throw Error('请先完成当前房间搬运并停靠。');
   if(transfer||route){pending=v;state.paused=false;showThought('有了新的安排，我先把这一步走稳，再认真做下一件事。');return;}
@@ -78,8 +96,10 @@ function createFengPeng(){
  }
  function calculate(data){
   const source=$('characterWorkerSource').textContent,url=URL.createObjectURL(new Blob([source],{type:'text/javascript'}));
-  return new Promise((resolve,reject)=>{const w=new Worker(url);URL.revokeObjectURL(url);worker=w;const timer=setTimeout(()=>{w.terminate();if(worker===w)worker=null;reject(Error('人物路线规划超时，请重试。'));},10000);
-   w.onmessage=e=>{clearTimeout(timer);w.terminate();if(worker===w)worker=null;e.data.error?reject(Error(e.data.error)):resolve(e.data.plan);};w.onerror=()=>{clearTimeout(timer);w.terminate();if(worker===w)worker=null;reject(Error('人物规划线程发生错误。'));};w.postMessage(data);
+  return new Promise((resolve,reject)=>{const w=new Worker(url);URL.revokeObjectURL(url);worker=w;
+   const finish=(error,plan)=>{clearTimeout(timer);w.terminate();if(worker===w){worker=null;cancelWorker=null;}error?reject(Error(error)):resolve(plan);};
+   const timer=setTimeout(()=>finish('人物路线规划超时，请重试。'),10000);cancelWorker=()=>finish('人物规划已取消。');
+   w.onmessage=e=>finish(e.data.error,e.data.plan);w.onerror=()=>finish('人物规划线程发生错误。');w.postMessage(data);
   });
  }
  async function planVisit(autoActivity=null){
@@ -101,7 +121,7 @@ function createFengPeng(){
   }catch(e){if(token!==generation)return;planning=false;state.status='等待调整';if(a)state.failed[a.id]=state.clock;state.visits=[];state.idle=0;showThought(e.message);log('planning-failed',{reason:e.message});}
  }
  function startWalk(p){route=p;piece=0;pieceTime=0;state.status='前往目的地';uiClock=1;requestRender();if(!p.pieces.length)arrive();}
- function arrive(){route=null;const visit=state.visits[state.index];if(!visit)return;if(visit.activityId)state.walkOnlyTrips=visit.hadTransport?0:state.walkOnlyTrips+1;state.room=visit.room-1;state.position=visit.point.position.slice();state.yaw=visit.point.yaw;activity=visit;activityTime=0;animate(visit.action);state.status='到达活动';const a=D.activities.find(a=>a.id===visit.activityId);showThought(a?'到了，先静下心来。'+D.activityThought(a):D.visitThought(visit));log('arrived',{room:state.room,index:state.index});}
+ function arrive(){route=null;if(pending){acceptPending();return;}const visit=state.visits[state.index];if(!visit)return;if(visit.activityId)state.walkOnlyTrips=visit.hadTransport?0:state.walkOnlyTrips+1;state.room=visit.room-1;state.position=visit.point.position.slice();state.yaw=visit.point.yaw;activity=visit;activityTime=0;animate(visit.action);state.status='到达活动';const a=D.activities.find(a=>a.id===visit.activityId);showThought(a?'到了，先静下心来。'+D.activityThought(a):D.visitThought(visit));log('arrived',{room:state.room,index:state.index});}
  function acceptPending(){if(!pending)return false;const task=pending;pending=null;clearTask();if(task.command==='stop'){showThought('已经停稳了，先歇一会儿，慢慢想想之后的安排。');return true;}dispatch(task).catch(e=>showThought(e.message));return true;}
  function tick(dt){
   portrait.tick(dt);
@@ -119,7 +139,7 @@ function createFengPeng(){
     else{state.yaw=Math.atan2(p.b[0]-p.a[0],p.b[2]-p.a[2]);animate((state.speed||1.35)>2?'run':'walk');state.status='行走';}
     state.progress=(piece+u)/route.pieces.length;
     if(u>=1){state.room=p.nextRoom;const nextAnchor=nodePositionFor(state.room);state.position=p.b.map((v,k)=>v-nextAnchor[k]);piece++;pieceTime=0;
-     if(pending&&Math.abs(state.position[1]-14.08)<.1&&Math.hypot(state.position[0],state.position[2])<.1){route=null;acceptPending();break;}
+     if(pending&&D.safeRoomPosition(state.position)){route=null;acceptPending();break;}
      if(piece>=route.pieces.length){arrive();break;}
     }
    }
@@ -127,7 +147,7 @@ function createFengPeng(){
    if(activityTime>=activity.seconds){const a=D.activities.find(a=>a.id===activity.activityId);if(a){state.completed[a.id]=state.clock;state.profileAt[a.profile]=state.clock;if(a.profile===0)state.fatigue=Math.max(0,state.fatigue-35);nextActivity=a.next;}log('activity-complete',{room:state.room,activity:activity.activityId});activity=null;state.index++;animate('idle');
     if(state.index<state.visits.length)planVisit();else{state.visits=[];state.index=0;state.idle=0;state.status='待机';showThought(a?`“${a.name}”这件事先告一段落。想留一点时间消化刚才的观察，再想下一件事。`:'这次到访结束了。想歇一会儿，把刚才看到的东西理一理。');}
    }
-  }else if(!planning&&!playing&&!(time>0&&time<duration)&&!manualMode){state.idle+=step;
+  }else if(!planning&&!roomReservation&&!scheduling&&!playing&&!(time>0&&time<duration)&&!manualMode){state.idle+=step;
    if(state.auto&&state.idle>=Number($('characterIdle').value||30)){const a=nextActivity&&!D.requiresTransport(state)?D.activities.find(a=>a.id===nextActivity):D.chooseActivity(state,state.clock,Math.random,currentLayout());nextActivity=null;if(a)planVisit(a);}
   }
   const rendered=state.visible&&(!studioMode||selectedRoom===state.room);if(rendered){mixer.update(step);if(hips&&actionName==='climb')hips.position.x=hipOrigin.x;renderer.shadowMap.needsUpdate=true;}
@@ -140,7 +160,7 @@ function createFengPeng(){
   if(state.follow&&!roaming&&!studioMode){selectedRoom=state.room;sectionMode=true;const floor=Math.max(0,Math.min(4,Math.round((anchor[1]-C.config.baseY)/C.config.pitchY)));if(visibleFloor!==floor)applyFloorSelection(floor);goal.target.copy(group.position).add(new T.Vector3(0,9,0));}
  }
  function ui(){putText('characterStatus',`${D.roomLabel(state.room)} · ${state.paused?'已暂停':state.status}`);putText('characterThought',state.thought);$('characterProgress').value=state.progress;$('characterAuto').checked=state.auto;$('characterVisible').checked=state.visible;$('characterHighlight').checked=state.highlight;putText('characterPause',state.paused?'继续':'暂停');
-  const summary=state.plan?`预计 ${state.plan.estimatedSeconds.toFixed(1)} 秒 · 步行 ${state.plan.walkMetres.toFixed(1)} 米 · 搬运 ${state.plan.moves} 次`:'8 类舱室 · '+D.activities.length+' 项自主活动';putText('characterMetrics',summary);
+  const summary=state.plan?`预计 ${state.plan.estimatedSeconds.toFixed(1)} 秒 · 步行 ${state.plan.walkMetres.toFixed(1)} 米 · 搬运 ${state.plan.moves} 次`:D.profiles.length+' 类舱室 · '+D.activities.length+' 项自主活动';putText('characterMetrics',summary);
   const text=state.visits.map((v,i)=>`${i<state.index?'✓':i===state.index?'→':'·'} ${D.roomLabel(v.room-1)} · ${v.seconds} 秒`).join('\n');putText('characterItinerary',text);
  }
  function stopFollowing(){
@@ -152,7 +172,7 @@ function createFengPeng(){
   else{const saved={name:viewName,section:sectionMode,floor:visibleFloor,room:selectedRoom,goal:{...goal,target:goal.target.clone()}};chooseView('overview');showPanel(null);previousView=saved;state.follow=true;goal.distance=180;goal.pitch=.65;goal.yaw=.6;selectedRoom=state.room;sectionMode=true;}
   $('characterFocus').setAttribute('aria-pressed',String(state.follow));putText('characterFocus',state.follow?'退出跟随':'跟随观察');requestRender();
  }
- function reset(){stopFollowing();state.walkOnlyTrips=0;pending=null;transfer=null;clearTask();state.room=selectedRoom;state.position=[0,14.08,0];state.paused=false;state.plan=null;state.idle=0;showThought('周围重新安顿好了，想先熟悉一下这里，再开始今天的事情。');}
+ function reset(){cancelRoomScheduling('布局已重置，房间调度已取消，请重新提交。');stopFollowing();state.walkOnlyTrips=0;pending=null;transfer=null;clearTask();state.room=selectedRoom;state.position=[0,14.08,0];state.paused=false;state.plan=null;state.idle=0;showThought('周围重新安顿好了，想先熟悉一下这里，再开始今天的事情。');}
  function setPanelExpanded(expanded){portrait.setExpanded(expanded);const panel=$('characterPanel'),body=$('characterPanelBody'),toggle=$('characterPanelToggle');panel.classList.toggle('is-collapsed',!expanded);toggle.setAttribute('aria-expanded',String(expanded));toggle.setAttribute('aria-label',expanded?'收起冯院长面板':'展开冯院长面板');body.inert=!expanded;body.setAttribute('aria-hidden',String(!expanded));if(!expanded&&body.contains(document.activeElement))toggle.focus();}
  $('characterPanelClose').onclick=()=>setPanelExpanded(false);
  $('characterPanelToggle').onclick=()=>setPanelExpanded($('characterPanelToggle').getAttribute('aria-expanded')!=='true');
@@ -160,5 +180,5 @@ function createFengPeng(){
  $('characterHighlight').onchange=e=>{state.highlight=e.target.checked;requestRender();};
  $('characterVisible').onchange=e=>{state.visible=e.target.checked;requestRender();};$('characterAuto').onchange=e=>control(e.target.checked?'auto_on':'auto_off');$('characterPause').onclick=()=>control(state.paused?'resume':'pause');$('characterStop').onclick=()=>control('stop');$('characterFocus').onclick=focus;
  $('characterExample').onclick=()=>{$('scheduleInput').value='冯院长先去 R14 停留 5 秒，再去 R20 停留 8 秒并挥手';showPanel('schedulerPanel');$('scheduleInput').focus();};
- return {state,tick,sync,dispatch,reset,busy,ui,focus,stopFollowing,export:snapshotExport,get transferring(){return !!transfer;},get needsFrames(){return portrait.needsFrames||state.loaded&&!state.paused&&(state.visible||busy()||state.auto);},get transportState(){return transfer?C.state(transfer.base,transfer.phases,transfer.time,transfer.elevators):null;},get planning(){return planning;}};
+ return {state,tick,sync,dispatch,reset,busy,ui,focus,stopFollowing,prepareRoomScheduling,cancelRoomScheduling,releaseRoomScheduling,export:()=>({...snapshotExport(),busy:busy(),planning,pendingCommand:pending?.command||null,roomScheduling:roomReservation,transferring:!!transfer}),get roomScheduling(){return roomReservation;},get transferring(){return !!transfer;},get needsFrames(){return portrait.needsFrames||state.loaded&&!state.paused&&(state.visible||busy()||state.auto);},get transportState(){return transfer?C.state(transfer.base,transfer.phases,transfer.time,transfer.elevators):null;},get planning(){return planning;}};
 }

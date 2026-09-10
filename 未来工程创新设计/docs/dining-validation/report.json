@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "room": 19,
+  "profile": "DIN",
+  "plan": {
+    "destination": 18,
+    "estimatedSeconds": 81.3710180733618,
+    "walkMetres": 27.125,
+    "moves": 2,
+    "search": {
+      "expanded": 1422,
+      "candidates": 1122,
+      "fastest": 81.3710180733618,
+      "tolerance": 2,
+      "scope": "限时搜索中的最优候选"
+    }
+  }
+}

@@ -22,6 +22,7 @@ const sceneFiles = [
   'src/scene/studio-transition.js',
   'src/scene/character-portrait.js',
   'src/scene/character.js',
+  'src/ui/audio.js',
   'src/ui/app.js',
 ];
 const scripts = [
@@ -52,12 +53,13 @@ const characterWorkerSource=joinSources(coreFiles)+'\nself.onmessage=e=>{try{sel
 new vm.Script(characterWorkerSource,{filename:'character-worker.js'});
 const escapeScript = source => source.replace(/<\/script/gi, '<\\/script');
 const template = read('src/ui/template.html');
-for (const marker of ['FONTS', 'STYLES', 'SCRIPTS', 'SCHEDULER WORKER']) {
+for (const marker of ['FONTS', 'STYLES', 'SCRIPTS', 'SCHEDULER WORKER', 'BACKGROUND MUSIC']) {
   if (template.split(`<!-- ${marker} -->`).length !== 2) {
     throw new Error(`UI template must contain exactly one ${marker} build marker.`);
   }
 }
 const html = template
+  .replace('<!-- BACKGROUND MUSIC -->', () => `<audio id="backgroundMusic" loop preload="metadata" src="data:audio/mpeg;base64,${base64('assets/audio/flow-of-life.mp3')}"></audio>`)
   .replace('<!-- CHARACTER STANDEE -->', () => `<img class="character-standee" src="data:image/png;base64,${base64('assets/character/feng-peng-side-profile.png')}" style="--character-cutout:url(data:image/png;base64,${base64('assets/character/feng-peng-side-mask.png')})" alt="朝左略微低头的冯鹏侧脸立绘">`)
   .replace('<!-- CHARACTER PORTRAIT -->', () => `<img src="data:image/png;base64,${base64('assets/character/feng-peng-portrait.png')}" alt="冯鹏" width="56" height="56">`)
   .replace('<!-- SCHEDULER WORKER -->', () => `<script id="schedulerWorkerSource" type="text/plain">${escapeScript(workerSource)}</script><script id="characterWorkerSource" type="text/plain">${escapeScript(characterWorkerSource)}</script>`)
