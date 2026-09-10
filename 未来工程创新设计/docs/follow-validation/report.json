@@ -1,0 +1,15 @@
+{
+  "errors": [],
+  "audit": {
+    "samples": 237,
+    "transfers": 47,
+    "walking": 58,
+    "climbing": 75,
+    "failures": []
+  },
+  "restored": {
+    "rooms": 24,
+    "passes": 2,
+    "quality": "performance"
+  }
+}

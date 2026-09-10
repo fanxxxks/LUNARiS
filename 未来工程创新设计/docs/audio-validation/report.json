@@ -1,0 +1,61 @@
+{
+  "url": "offline file",
+  "errors": [],
+  "signal": {
+    "peak": 0.04323924332857132,
+    "rms": 0.014076931517545221
+  },
+  "recoveredSignal": 0.11371663957834244,
+  "completed": {
+    "state": "running",
+    "failed": false,
+    "lastError": "",
+    "recoveries": 0,
+    "settings": {
+      "muted": false,
+      "mechanical": 64,
+      "ui": 28,
+      "music": 18,
+      "musicEnabled": true
+    },
+    "music": {
+      "playing": true,
+      "loop": true,
+      "time": 12.83773,
+      "duration": 197.986667,
+      "error": ""
+    },
+    "motor": false,
+    "voices": 0,
+    "phase": "dock",
+    "counts": {
+      "panelOpen": 2,
+      "click": 1,
+      "panelClose": 1,
+      "unlock": 7,
+      "off": 1,
+      "on": 1,
+      "dock": 6,
+      "retract": 2,
+      "deploy": 2,
+      "complete": 1
+    },
+    "dockingRooms": []
+  },
+  "checks": [
+    "first gesture unlock",
+    "actual waveform and peak",
+    "closed audio device restores real output",
+    "pause cleanup",
+    "silent timeline seeking",
+    "16x docking and completion",
+    "mute during motion",
+    "persisted settings",
+    "emergency stop",
+    "background suspension",
+    "mobile controls",
+    "reduced motion",
+    "keyboard activation",
+    "no AudioContext fallback"
+  ]
+}

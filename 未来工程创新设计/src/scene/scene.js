@@ -324,6 +324,24 @@ function indexExactGeometry(geo){
 }
 const indexedGeometries=new Set();scene.traverse(o=>{if(o.isMesh&&!indexedGeometries.has(o.geometry)){indexExactGeometry(o.geometry);indexedGeometries.add(o.geometry);}});
 let lastFloor=null,lastFrameOnly=null,lastSection=null,lastStudio=null,lastStudioDeck=null,lastCharacterDeck=null;const instanceState=rooms.map(()=>null),instanceTransforms=rooms.map(()=>({shown:new T.Matrix4(),hidden:new T.Matrix4()}));
+function invalidateRoomInstances(){
+ instanceState.fill(null);lastFloor=lastFrameOnly=lastSection=lastStudio=lastStudioDeck=lastCharacterDeck=null;
+ renderer.shadowMap.needsUpdate=true;
+}
+// Read-only audit of the actual instance buffers, called by diagnostics/tests,
+// never by the per-frame render path.
+function inspectRoomInstances(){
+ const roomInstances=rooms.map((r,id)=>({room:id+1,visible:!!r.userData.visible,shown:0,shells:0,interiors:0}));let invalidMatrices=0,boundsErrors=0;
+ const matrix=new T.Matrix4(),center=new T.Vector3();
+ for(const batch of moduleBatches){const data=batch.mesh.instanceMatrix.array,bound=batch.mesh.boundingSphere,local=batch.mesh.geometry.boundingSphere;
+  batch.ids.forEach((id,j)=>{const offset=j*16;for(let k=0;k<16;k++)if(!Number.isFinite(data[offset+k]))invalidMatrices++;
+   if(Math.abs(data[offset])+Math.abs(data[offset+5])+Math.abs(data[offset+10])<1e-8)return;
+   const room=roomInstances[id];room.shown++;if(batch.layer==='skin'||batch.layer==='roof')room.shells++;if(batch.layer.startsWith('interior'))room.interiors++;
+   if(local&&bound){matrix.fromArray(data,offset);center.copy(local.center).applyMatrix4(matrix);if(center.distanceTo(bound.center)+local.radius*matrix.getMaxScaleOnAxis()>bound.radius+.05)boundsErrors++;}
+  });
+ }
+ return {roomInstances,invalidMatrices,boundsErrors};
+}
 function updateInstances(positions,visibleFloor,frameOnly,orientations=null,sectionRoom=-1,studioRoom=-1,studioDeck='exterior'){
  const characterDeck=fengPeng?.state.follow?(fengPeng.state.position[1]<39?'lower':'upper'):null;
  const filterChanged=characterDeck!==lastCharacterDeck||visibleFloor!==lastFloor||frameOnly!==lastFrameOnly||sectionRoom!==lastSection||studioRoom!==lastStudio||studioDeck!==lastStudioDeck,changed=new Set();

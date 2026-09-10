@@ -10,7 +10,7 @@ function createFengPeng(){
  const footRing=new T.LineLoop(new T.BufferGeometry().setFromPoints(ringPoints),markerMaterial);footRing.name='character-highlight-ring';footRing.renderOrder=1002;group.add(footRing);
  const headMarker=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(-2,23,0),new T.Vector3(0,21,0),new T.Vector3(2,23,0)]),markerMaterial);headMarker.name='character-highlight-marker';headMarker.renderOrder=1002;group.add(headMarker);
  const highlights=[footRing,headMarker];
- const state={loaded:false,visible:true,highlight:true,walkOnlyTrips:0,paused:false,auto:true,follow:false,status:'载入角色',thought:'正在整理行装…',room:selectedRoom,position:[0,14.08,0],yaw:0,idle:0,clock:0,fatigue:0,completed:{},profileAt:{},failed:{},visits:[],index:0,history:[],progress:0,plan:null};
+ const state={loaded:false,visible:true,highlight:true,walkOnlyTrips:0,followCutaway:true,paused:false,auto:true,follow:false,status:'载入角色',thought:'正在整理行装…',room:selectedRoom,position:[0,14.08,0],yaw:0,idle:0,clock:0,fatigue:0,completed:{},profileAt:{},failed:{},visits:[],index:0,history:[],progress:0,plan:null};
  let mixer,clips={},currentAction=null,hips,hipOrigin,model,groundOffset=0,loadError=null,planning=false,worker=null,generation=0,route=null,piece=0,pieceTime=0,activity=null,activityTime=0,transfer=null,pending=null,nextActivity=null,uiClock=0,previousView=null;
  let actionName='idle';
  let cancelWorker=null,roomReservation=false,roomHandoff=null;
@@ -130,7 +130,7 @@ function createFengPeng(){
   const step=dt;state.clock+=step;state.fatigue=Math.min(100,state.fatigue+step*.025);
   if(transfer){
    const stopDock=pending?transfer.phases.find(p=>p.type==='dock'&&p.end>transfer.time+1e-8):null;
-   transfer.time=Math.min(transfer.duration,stopDock?.end??Infinity,transfer.time+step);state.progress=transfer.time/transfer.duration;animate('idle');
+   const previousTransferTime=transfer.time;transfer.time=Math.min(transfer.duration,stopDock?.end??Infinity,transfer.time+step);transportFeedback(transfer.phases,previousTransferTime,transfer.time);state.progress=transfer.time/transfer.duration;animate('idle');
    if(transfer.time>=transfer.duration||stopDock&&transfer.time>=stopDock.end){const tr=transfer,end=C.state(tr.base,tr.phases,tr.time,tr.elevators);baseLayout=end.layout.slice();baseElevators=structuredClone(end.elevators);phases=[];moves=[];duration=time=0;playing=false;snapshotCache=null;transfer=null;showPlan();controls();if(!acceptPending()){const visit=state.visits[state.index];if(visit&&tr.time>=tr.duration)visit.hadTransport=true;startWalk(tr.after);}}
   }else if(route){
    let remaining=step;
@@ -155,11 +155,18 @@ function createFengPeng(){
  function nodePositionFor(room){return snapshot().positions[room];}
  function sync(){
   highlights.forEach(o=>{o.visible=state.highlight;});
+  if(state.follow&&!roaming&&!studioMode){
+   selectedRoom=state.room;
+   // Following owns the camera, not a floor filter. A moving cabin keeps its
+   // complete shell; cutaway is only an explicit stationary-room inspection.
+   if(visibleFloor!==-1)applyFloorSelection(-1);
+   sectionMode=state.followCutaway&&!transfer&&!playing;
+  }
   group.visible=state.loaded&&state.visible&&!cutaway&&(!studioMode||selectedRoom===state.room)&&(visibleFloor<0||Math.abs((nodePositionFor(state.room)[1]-C.config.baseY)/C.config.pitchY-visibleFloor)<.52);
   if(!state.loaded)return;const anchor=nodePositionFor(state.room);group.position.set(...state.position.map((v,k)=>v+anchor[k]));group.rotation.y=state.yaw;
-  if(state.follow&&!roaming&&!studioMode){selectedRoom=state.room;sectionMode=true;const floor=Math.max(0,Math.min(4,Math.round((anchor[1]-C.config.baseY)/C.config.pitchY)));if(visibleFloor!==floor)applyFloorSelection(floor);goal.target.copy(group.position).add(new T.Vector3(0,9,0));}
+  if(state.follow&&!roaming&&!studioMode)goal.target.copy(group.position).add(new T.Vector3(0,9,0));
  }
- function ui(){putText('characterStatus',`${D.roomLabel(state.room)} · ${state.paused?'已暂停':state.status}`);putText('characterThought',state.thought);$('characterProgress').value=state.progress;$('characterAuto').checked=state.auto;$('characterVisible').checked=state.visible;$('characterHighlight').checked=state.highlight;putText('characterPause',state.paused?'继续':'暂停');
+ function ui(){putText('characterStatus',`${D.roomLabel(state.room)} · ${state.paused?'已暂停':state.status}`);putText('characterThought',state.thought);$('characterProgress').value=state.progress;$('characterAuto').checked=state.auto;$('characterVisible').checked=state.visible;$('characterHighlight').checked=state.highlight;$('characterCutaway').checked=state.followCutaway;putText('characterPause',state.paused?'继续':'暂停');
   const summary=state.plan?`预计 ${state.plan.estimatedSeconds.toFixed(1)} 秒 · 步行 ${state.plan.walkMetres.toFixed(1)} 米 · 搬运 ${state.plan.moves} 次`:D.profiles.length+' 类舱室 · '+D.activities.length+' 项自主活动';putText('characterMetrics',summary);
   const text=state.visits.map((v,i)=>`${i<state.index?'✓':i===state.index?'→':'·'} ${D.roomLabel(v.room-1)} · ${v.seconds} 秒`).join('\n');putText('characterItinerary',text);
  }
@@ -177,6 +184,7 @@ function createFengPeng(){
  $('characterPanelClose').onclick=()=>setPanelExpanded(false);
  $('characterPanelToggle').onclick=()=>setPanelExpanded($('characterPanelToggle').getAttribute('aria-expanded')!=='true');
  $('characterPanel').addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();setPanelExpanded(false);$('characterPanelToggle').focus();}});
+ $('characterCutaway').onchange=e=>{state.followCutaway=e.target.checked;requestRender();};
  $('characterHighlight').onchange=e=>{state.highlight=e.target.checked;requestRender();};
  $('characterVisible').onchange=e=>{state.visible=e.target.checked;requestRender();};$('characterAuto').onchange=e=>control(e.target.checked?'auto_on':'auto_off');$('characterPause').onclick=()=>control(state.paused?'resume':'pause');$('characterStop').onclick=()=>control('stop');$('characterFocus').onclick=focus;
  $('characterExample').onclick=()=>{$('scheduleInput').value='冯院长先去 R14 停留 5 秒，再去 R20 停留 8 秒并挥手';showPanel('schedulerPanel');$('scheduleInput').focus();};

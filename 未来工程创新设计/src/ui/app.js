@@ -1,13 +1,23 @@
 const taskNames={vertical:'科研协作案例',cascade:'维修隔离案例',district:'基地扩建案例',manual:'手动调度',natural:'自然语言调度'};
 const phaseNames={ready:'已就绪',retract:'升降托架收拢',emptyLift:'空载升降机构定位',deploy:'升降托架展开',unlock:'解除泊位锁定',translate:'沿楼板导轨平移',elevate:'内部升降 · Y 轴跨层',dock:'落座对接并锁定',done:'重构完成'};
 const metres=n=>(n*C.config.metresPerUnit).toFixed(1),fmt=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
-let fengPeng=null;
-const backgroundAudio=createLunarAudio();
+let fengPeng=null,renderContextLost=false;
 let baseLayout=C.initial.slice(),baseElevators=C.config.baseY,moves=[],phases=[],duration=0,time=0,playing=false,estop=false,task='vertical',ready=false,events=[];
 let flowData=null,flowKey='',flowClock=0,benchmark=null,nextRenderDeadline=0,lastDiagnosticsAt=-Infinity;
 let previewMove=null,walking=false,sectionMode=false,needsRender=true,rafPending=false,inFrame=false,lastNow=performance.now(),snapshotCache=null;
 let selectedRoom=1,visibleFloor=-1,manualMode=false,pendingManual=false,cutaway=false,viewName='overview',roaming=false,routeKey='',toastTimer;
 let studioMode=false,studioDeck='exterior';
+const interactionAudio=createLunarAudio(requestRender);
+const dockingFlashes=new Map();
+function transportAudible(){return !estop&&!document.hidden&&!renderContextLost&&(fengPeng?.transferring?!fengPeng.state.paused:playing);}
+// Detect crossed docking boundaries from simulation time, including skipped frames at 16×.
+function transportFeedback(sequence,before,after){
+ if(after<=before)return;
+ const docks=sequence.filter(p=>p.type==='dock'&&p.end>before&&p.end<=after);
+ if(!docks.length)return;
+ const now=performance.now();for(const dock of docks)dockingFlashes.set(dock.room,{at:now,node:dock.to});
+ interactionAudio.cue('dock');if(after>=sequence.at(-1).end)interactionAudio.cue('complete');requestRender();
+}
 const studioTransition=createStudioTransition();
 let studioTarget=null,studioCommit=null;
 let yaw=.72,pitch=.2,distance=1230,target=new T.Vector3(-30,212,0),goal={yaw:.72,pitch:.2,distance:1230,target:new T.Vector3(-30,212,0)};
@@ -45,7 +55,7 @@ document.addEventListener('click',event=>{if(activePanel&&!event.target.closest(
 const overviewDistance=()=>mobile()?1320:1230;
 distance=goal.distance=overviewDistance();
 const audit=(event,detail)=>events.push({event,time:+time.toFixed(3),detail});
-function notify(message,bad=false){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').classList.toggle('bad',bad);$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,bad?6500:3800);}
+function notify(message,bad=false){if(bad)interactionAudio.cue('error');clearTimeout(toastTimer);$('toast').textContent=message;$('toast').classList.toggle('bad',bad);$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,bad?6500:3800);}
 const blocked=()=>$('block').checked?[C.lift(1,'C')]:[];
 const snapshot=()=>{const personTransfer=fengPeng?.transportState;if(personTransfer)return personTransfer;if(!snapshotCache||snapshotCache.base!==baseLayout||snapshotCache.phases!==phases||snapshotCache.time!==time)snapshotCache={base:baseLayout,phases,time,state:C.state(baseLayout,phases,time,baseElevators)};return snapshotCache.state;};
 function requestRender(){needsRender=true;resetAccumulation();if(!rafPending&&!inFrame){rafPending=true;lastNow=performance.now();nextRenderDeadline=0;requestAnimationFrame(frame);}}
@@ -115,6 +125,7 @@ function applyFloorSelection(level){visibleFloor=level;if(level>=0)setMapFloor(l
 function setFloor(level){fengPeng?.stopFollowing();leaveStudio();requestRender();applyFloorSelection(level);if(level<0)chooseView('overview');else{cutaway=false;roaming=false;viewName='layer';goal={yaw:.64,pitch:.72,distance:mobile()?1160:980,target:new T.Vector3(level>=2?-55:-12,C.config.baseY+level*C.config.pitchY+25,0)};updateViewButtons();}drawUI(snapshot());}
 $('allFloors').onclick=()=>setFloor(-1);
 function controls(){
+ if(!transportAudible())interactionAudio.silence();
  requestRender();lastUI=-Infinity;
 
  document.body.classList.toggle('manual-mode',manualMode||pendingManual);
@@ -151,6 +162,7 @@ function showPlan(){
  $('log').innerHTML=moves.map(m=>`<li>${buildingNames[m.room]}<br>${C.nodes[m.from].label} → ${C.nodes[m.to].label}${m.vertical?' · 跨层':''}</li>`).join('')||'<li>选择建筑后，使用房间与空闲泊位。</li>';
 }
 function compile(name,auto=true){
+ dockingFlashes.clear();interactionAudio.silence();
  fengPeng?.reset();
  naturalPlan=null;task=name;manualMode=false;pendingManual=false;estop=false;playing=false;time=0;baseLayout=C.initial.slice();baseElevators=C.config.baseY;previewMove=null;events=[];selectedRoom=C.missions[name].roomIds[0];
  try{const p=C.preset(name,blocked());moves=p.moves;const tl=C.timeline(moves,32,baseElevators);phases=tl.phases;duration=tl.duration;ready=true;playing=auto;audit('plan',{task,initial:baseLayout.slice(),target:p.target,blocked:blocked(),metresPerUnit:C.config.metresPerUnit});}
@@ -194,7 +206,7 @@ $('scheduleForm').onsubmit=async e=>{
  try{
   if(estop)throw Error('请先解除急停，再提交调度目标。');
   if(time>0&&time<duration)throw Error('当前计划尚未完成。请先播放至停靠完成，或恢复初始房间布局后提交。');
-  const text=$('scheduleInput').value.trim();if(!text||text.length>600)throw Error('请输入 1–600 字的调度目标。');
+  const text=$('scheduleInput').value.trim();if(!text||text.length>600)throw Error('请输入 1–600 字的调度目标。');interactionAudio.cue('submit');
   scheduling=true;$('scheduleSubmit').disabled=true;
   if(/冯鹏|冯院长|冯老师/.test(text)){
    let intent=LunarCharacter.parse(text);
@@ -224,7 +236,7 @@ $('scheduleForm').onsubmit=async e=>{
   $('scheduleTargets').replaceChildren(...p.roomIds.map((id,i)=>{const li=document.createElement('li');li.textContent=`${i+1}. R${String(id+1).padStart(2,'0')} ${buildingNames[id]} · ${C.nodes[p.nodes[i]].label}`;return li;}));
   putText('scheduleStatus',moves.length?`${p.summary}\n已生成 ${moves.length} 次搬运，正在自动执行。`:`目标已满足 · ${p.summary}`);
   notify(moves.length?`调度已开始 · ${moves.length} 次搬运。`:'当前布局已满足指令，目标模块已高亮。');
- }catch(error){$('scheduleStatus').classList.add('bad');putText('scheduleStatus',error.message);}
+ }catch(error){interactionAudio.cue('error');$('scheduleStatus').classList.add('bad');putText('scheduleStatus',error.message);}
  finally{if(roomSchedulingOwned)fengPeng?.releaseRoomScheduling();scheduling=false;$('scheduleSubmit').disabled=false;requestRender();}
 };
 $('scheduleReset').onclick=()=>{$('scheduleInput').value='';$('scheduleInput').focus();};
@@ -236,6 +248,12 @@ const motionBox=new T.BoxGeometry(C.config.width+2,C.config.height+2,C.config.de
 const motionEdges=new T.EdgesGeometry(motionBox);motionBox.dispose();
 const motionMaterial=new T.LineBasicMaterial({color:'#c5ffdc',depthTest:false,depthWrite:false,transparent:true,opacity:.94,toneMapped:false});
 const roomOutlines=rooms.map(()=>{const outline=new T.LineSegments(motionEdges,motionMaterial);outline.renderOrder=1000;outline.visible=false;motionFrames.add(outline);return outline;});
+const dockingOutlines=rooms.map(()=>{const material=new T.LineBasicMaterial({color:'#baffd8',transparent:true,depthTest:false,depthWrite:false,toneMapped:false});const outline=new T.LineSegments(motionEdges,material);outline.renderOrder=1001;outline.visible=false;motionFrames.add(outline);return outline;});
+function updateDockingFeedback(now){
+ for(const [room,flash] of dockingFlashes)if(now-flash.at>=1100)dockingFlashes.delete(room);
+ dockingOutlines.forEach((outline,room)=>{const flash=dockingFlashes.get(room);outline.visible=!!flash&&!studioMode&&!cutaway&&rooms[room].userData.visible;if(outline.visible){outline.position.copy(rooms[room].position);outline.rotation.copy(rooms[room].rotation);outline.material.opacity=reducedMotion?.8:.95*(1-(now-flash.at)/1100);}});
+ for(const button of mapButtons)button.classList.toggle('just-docked',[...dockingFlashes.values()].some(flash=>flash.node===Number(button.dataset.node)));
+}
 function updateMotionOverlay(st){
  if(studioMode){roomOutlines.forEach(outline=>outline.visible=false);$('motionBubble').hidden=$('motionLeader').hidden=true;return;}
  const inTransfer=st.phase&&time>0&&time<duration,completedTargets=naturalPlan&&time>=duration?naturalPlan.roomIds:[];
@@ -262,9 +280,9 @@ $('speed').onchange=()=>setPlaybackRate(Number($('speed').value));
 $('speedMenu').addEventListener('keydown',e=>{const index=playbackRates.findIndex(n=>$('rate'+n)===document.activeElement);let next=index;if(e.key==='ArrowDown')next=(index+1)%playbackRates.length;else if(e.key==='ArrowUp')next=(index-1+playbackRates.length)%playbackRates.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=playbackRates.length-1;else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeSpeedMenu(true);return;}else if(e.key==='Tab'){closeSpeedMenu(true);return;}else return;e.preventDefault();$('rate'+playbackRates[next]).focus();});
 $('speedToggle').addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();$('speedMenu').hidden=false;$('speedToggle').setAttribute('aria-expanded','true');$('rate'+$('speed').value).focus();}});
 document.addEventListener('click',e=>{if(!e.target.closest('.speed-control'))closeSpeedMenu();});
-$('play').onclick=()=>{if(fengPeng?.busy()){notify('请先停止人物行程并等待安全停靠。',true);return;}if(!ready)return;if(estop){estop=false;notify('急停已解除。');}if(time>=duration)time=0;playing=!playing;if(playing&&(cutaway||viewName==='closeup'||studioMode))chooseView('overview');audit(playing?'play':'pause');controls();};
-$('replay').onclick=()=>{if(fengPeng?.busy()){notify('请先停止人物行程并等待安全停靠。',true);return;}time=0;playing=true;estop=false;pendingManual=false;if(cutaway||viewName==='closeup'||studioMode)chooseView('overview');audit('restart');controls();};
-$('timeline').oninput=e=>{if(estop||fengPeng?.busy())return;if(studioMode)chooseView('overview');playing=false;pendingManual=false;const requested=Number(e.target.value);time=Math.abs(duration-requested)<.025?duration:Math.max(0,Math.min(duration,requested));audit('seek');controls();drawUI(snapshot());};
+$('play').onclick=()=>{if(fengPeng?.busy()){notify('请先停止人物行程并等待安全停靠。',true);return;}if(!ready)return;if(estop){estop=false;notify('急停已解除。');}if(time>=duration)time=0;playing=!playing;if(playing&&(cutaway||viewName==='closeup'||studioMode))chooseView('overview');audit(playing?'play':'pause');interactionAudio.cue(playing?'on':'off');controls();};
+$('replay').onclick=()=>{if(fengPeng?.busy()){notify('请先停止人物行程并等待安全停靠。',true);return;}time=0;playing=true;estop=false;pendingManual=false;if(cutaway||viewName==='closeup'||studioMode)chooseView('overview');dockingFlashes.clear();audit('restart');interactionAudio.cue('on');controls();};
+$('timeline').oninput=e=>{if(estop||fengPeng?.busy())return;if(studioMode)chooseView('overview');playing=false;pendingManual=false;const requested=Number(e.target.value);time=Math.abs(duration-requested)<.025?duration:Math.max(0,Math.min(duration,requested));dockingFlashes.clear();audit('seek');controls();drawUI(snapshot());};
 function exitManual(){
  manualMode=false;pendingManual=false;previewMove=null;chooseView('overview');controls();drawUI(snapshot());
 }
@@ -281,7 +299,7 @@ $('manual').onclick=()=>{
  const st=snapshot();if(time>0&&time<duration&&st.phase){pendingManual=true;playing=true;cutaway=false;notify('当前建筑停靠后进入手动调度，保留已完成的布局。');controls();}else enterManual();
 };
 function moveSelected(to){
- if(!manualMode||estop)return;if(phases.length&&time<duration){notify('房间正在搬运，请等待停靠。');return;}
+ if(!manualMode||estop)return;if(phases.length&&time<duration){notify('房间正在搬运，请等待停靠。',true);return;}
  const current=snapshot(),layout=current.layout,from=layout.indexOf(selectedRoom);if(from===to)return;
  try{
   const transfer=C.move(layout,from,to,blocked());
@@ -308,8 +326,8 @@ function moveAxis(axis,sign){
  if(to===undefined){notify(axis===1?'该位置没有相邻层升降节点，跨层转运须先进入 A / B / C 内部升降通道。':'该方向已到达建筑边界，也可点击其它空位查看是否可达。',true);return;}moveSelected(to);
 }
 axisButtons.forEach(b=>b.onclick=()=>moveAxis(Number(b.dataset.axis),Number(b.dataset.sign)));
-function selectBay(node){const st=snapshot(),room=st.layout[node];if(room===null){if(manualMode)moveSelected(node);else notify('请选择房间后再选择空位。');}else selectRoom(room);}
-function selectRoom(room){previewMove=null;requestRender();selectedRoom=room;setMapFloor(C.nodes[snapshot().layout.indexOf(room)]?.level||0);drawUI(snapshot());if(!document.body.classList.contains('reduced')){showPanel('floorPanel');if(!manualMode&&!pendingManual)$('manual').click();}if(viewName==='closeup')chooseView('closeup');}
+function selectBay(node){const st=snapshot(),room=st.layout[node];if(room===null){if(manualMode)moveSelected(node);else notify('请选择房间后再选择空位。',true);}else selectRoom(room);}
+function selectRoom(room){interactionAudio.cue('click');previewMove=null;requestRender();selectedRoom=room;setMapFloor(C.nodes[snapshot().layout.indexOf(room)]?.level||0);drawUI(snapshot());if(!document.body.classList.contains('reduced')){showPanel('floorPanel');if(!manualMode&&!pendingManual)$('manual').click();}if(viewName==='closeup')chooseView('closeup');}
 const raycaster=new T.Raycaster(),pointer=new T.Vector2();
 function pick(x,y){if(studioMode)return;const rect=renderer.domElement.getBoundingClientRect();pointer.set((x-rect.left)/rect.width*2-1,-(y-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(pickMeshes,false);for(const hit of hits){const room=hit.object.userData.roomIds[hit.instanceId];if(rooms[room].userData.visible){selectRoom(room);break;}}}
 const pointers=new Map();let drag=null,pinch=0,pinchCenter=null;
@@ -330,7 +348,7 @@ for(const event of ['pointerup','pointercancel'])renderer.domElement.addEventLis
 renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();if(roaming){const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?window.innerHeight:1);roamSpeed=Math.max(.1,Math.min(8,roamSpeed*Math.exp(-Math.max(-600,Math.min(600,delta))*.002)));notify(`漫游速度 · ${roamSpeed.toFixed(1)}×`);}else goal.distance=Math.max(110,Math.min(3100,goal.distance*Math.exp(e.deltaY*.00085)));if(!roaming)syncInput();requestRender();},{passive:false});
 let focusBefore=null;function openSettings(){held.clear();showPanel(null);focusBefore=document.activeElement;$('settings').hidden=false;$('closeSettings').focus();}function closeSettings(){$('settings').hidden=true;focusBefore?.focus();}
 $('openSettings').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('settings').onclick=e=>{if(e.target===$('settings'))closeSettings();};
-$('stop').onclick=()=>{playing=false;estop=true;pendingManual=false;fengPeng?.cancelRoomScheduling('已急停，房间调度已取消；解除急停后可重新提交。');audit('emergency-stop');controls();closeSettings();notify('已急停。所有建筑保持当前位置，点击“解除急停”继续。',true);};
+$('stop').onclick=()=>{playing=false;estop=true;pendingManual=false;fengPeng?.cancelRoomScheduling('已急停，房间调度已取消；解除急停后可重新提交。');interactionAudio.silence(true);interactionAudio.cue('stop');audit('emergency-stop');controls();closeSettings();notify('已急停。所有建筑保持当前位置，点击“解除急停”继续。',true);};
 $('reset').onclick=()=>{const nextTask=['manual','natural'].includes(task)?'vertical':task;compile(nextTask,false);closeSettings();notify('已恢复初始建筑布局。');};
 $('block').onchange=()=>{if(task==='natural'){if($('block').checked&&time<duration&&moves.some(m=>m.nodePath.includes(C.lift(1,'C')))){$('block').checked=false;notify('当前自然语言计划使用 L2 · C 通道，请完成搬运后再封闭。',true);}else notify('通道状态已更新；后续指令使用新的通道约束。');requestRender();return;}if(manualMode){playing=false;pendingManual=false;previewMove=null;const st=snapshot();if(st.phase&&st.phase.nodePath.includes(C.lift(1,'C'))&&time<duration){$('block').checked=false;notify('当前计划使用 L2 · C 升降通道，请停靠后再封闭。',true);}controls();drawUI(snapshot());}else{compile(task,false);if(ready)notify('通道状态已更新，计划已重新验证。');}};
 $('presentation').onclick=()=>{showPanel(null);document.body.classList.add('reduced');$('exitImmersion').hidden=false;resize();};
@@ -347,7 +365,8 @@ document.addEventListener('keydown',e=>{
  }
 });
 document.addEventListener('keyup',e=>held.delete(e.code));window.addEventListener('blur',()=>held.clear());
-function applyQuality(){if(benchmark)finishBenchmark(true);putText('qualityLabel',configureRenderer($('quality').value,$('aaMode').value));resize();}
+function applyQuality(){if(benchmark)finishBenchmark(true);putText('qualityLabel',configureRenderer($('quality').value,$('aaMode').value));$('characterPerformance').checked=qualityMode==='performance';resize();}
+$('characterPerformance').onchange=e=>{$('quality').value=e.target.checked?'performance':'high';applyQuality();};
 $('quality').onchange=applyQuality;$('aaMode').onchange=applyQuality;
 $('targetFps').onchange=()=>{if(benchmark)finishBenchmark(true);nextRenderDeadline=0;requestRender();};
 $('exposure').oninput=()=>{renderer.toneMappingExposure=Number($('exposure').value);postMat.uniforms.exposure.value=Number($('exposure').value);requestRender();};
@@ -396,6 +415,23 @@ function updateRoute(st){
  }
  routeGroup.visible=$('paths').checked&&!cutaway&&visibleFloor<0;
 }
+const followBounds=new T.Box3(),followRayDirection=new T.Vector3(),followBoundsPoint=new T.Vector3();
+function protectFollowCamera(positions){
+ // Keep the orbit camera outside the complete frame and moving modules.
+ // Hiding upper floors is not a substitute for a safe camera position.
+ followBounds.makeEmpty();
+ for(const points of [C.slots,positions])for(const p of points){
+  followBounds.expandByPoint(followBoundsPoint.set(p[0]-C.config.width/2-12,p[1]-12,p[2]-C.config.depth/2-12));
+  followBounds.expandByPoint(followBoundsPoint.set(p[0]+C.config.width/2+12,p[1]+C.config.height+12,p[2]+C.config.depth/2+12));
+ }
+ followRayDirection.copy(camera.position).sub(target);const requested=followRayDirection.length();if(requested<.001)return;
+ followRayDirection.divideScalar(requested);let enter=-Infinity,leave=Infinity;
+ for(const axis of ['x','y','z']){const d=followRayDirection[axis],origin=target[axis];
+  if(Math.abs(d)<1e-7){if(origin<followBounds.min[axis]||origin>followBounds.max[axis])return;continue;}
+  const a=(followBounds.min[axis]-origin)/d,b=(followBounds.max[axis]-origin)/d;enter=Math.max(enter,Math.min(a,b));leave=Math.min(leave,Math.max(a,b));
+ }
+ if(leave>=Math.max(0,enter)&&requested>=enter-220&&requested<leave+220)camera.position.copy(target).addScaledVector(followRayDirection,leave+220);
+}
 let lastUI=-1;
 function draw(dt,now,force=false){
  fengPeng?.sync();
@@ -416,7 +452,11 @@ function draw(dt,now,force=false){
  else if($('follow').checked&&playing&&st.active>=0&&!roaming){goal.target.set(st.head[0],st.head[1]+35,st.head[2]);}
  if(roaming){const forward=new T.Vector3(Math.sin(freeYaw),0,Math.cos(freeYaw)),right=new T.Vector3(-Math.cos(freeYaw),0,Math.sin(freeYaw)),speed=dt*roamSpeed*(held.has('ShiftLeft')||held.has('ShiftRight')?230:75);if(held.has('KeyW'))freePosition.addScaledVector(forward,speed);if(held.has('KeyS'))freePosition.addScaledVector(forward,-speed);if(held.has('KeyD'))freePosition.addScaledVector(right,speed);if(held.has('KeyA'))freePosition.addScaledVector(right,-speed);if(held.has('KeyE'))freePosition.y+=speed;if(held.has('KeyQ'))freePosition.y-=speed;freePosition.y=Math.max(terrainY(freePosition.x,freePosition.z)+7,Math.min(2500,freePosition.y));freePosition.x=Math.max(-3500,Math.min(3500,freePosition.x));freePosition.z=Math.max(-3500,Math.min(3500,freePosition.z));camera.position.copy(freePosition);camera.lookAt(freePosition.x+Math.sin(freeYaw)*Math.cos(freePitch),freePosition.y+Math.sin(freePitch),freePosition.z+Math.cos(freeYaw)*Math.cos(freePitch));}
  else{const ease=reducedMotion?1:1-Math.exp(-dt*8);yaw+=(goal.yaw-yaw)*ease;pitch+=(goal.pitch-pitch)*ease;distance+=(goal.distance-distance)*ease;target.lerp(goal.target,ease);const dist=distance*Math.max(1,.9/camera.aspect);camera.position.set(target.x+Math.sin(yaw)*Math.cos(pitch)*dist,target.y+Math.sin(pitch)*dist,target.z+Math.cos(yaw)*Math.cos(pitch)*dist);camera.lookAt(target);if(Math.abs(goal.yaw-yaw)<.00001&&Math.abs(goal.pitch-pitch)<.00001&&Math.abs(goal.distance-distance)<.02&&target.distanceTo(goal.target)<.02){yaw=goal.yaw;pitch=goal.pitch;distance=goal.distance;target.copy(goal.target);}}
- camera.updateMatrixWorld();studioTransition.sync(studioMode,selectedRoom);updateMotionOverlay(st);const labelRoom=st.active>=0&&time>0?st.active:selectedRoom,r=rooms[labelRoom],v=r.position.clone().add(new T.Vector3(0,85,0)).project(camera),w=stage.clientWidth,h=stage.clientHeight,sx=(v.x+1)*w/2,sy=(1-v.y)*h/2;
+ if(fengPeng?.state.follow&&!roaming&&!studioMode){protectFollowCamera(st.positions);camera.lookAt(target);}
+ camera.updateMatrixWorld();studioTransition.sync(studioMode,selectedRoom);updateMotionOverlay(st);updateDockingFeedback(now);
+ const soundPosition=new T.Vector3().fromArray(st.head);station.localToWorld(soundPosition);const soundDistance=soundPosition.distanceTo(camera.position),soundPan=soundPosition.clone().project(camera).x;
+ interactionAudio.motion(st,transportAudible(),Number.isFinite(soundPan)?soundPan:0,1/(1+soundDistance/1600));
+ const labelRoom=st.active>=0&&time>0?st.active:selectedRoom,r=rooms[labelRoom],v=r.position.clone().add(new T.Vector3(0,85,0)).project(camera),w=stage.clientWidth,h=stage.clientHeight,sx=(v.x+1)*w/2,sy=(1-v.y)*h/2;
  activeLabel.hidden=studioMode||!$('labels').checked||!r.userData.visible||v.z>1||v.z< -1||sx<60||sx>w-60||sy<70||sy>h-20;const labelText=`${buildingNames[labelRoom]}${st.type==='elevate'?'  ↑↓ Y '+metres(st.head[1])+' m':''}`;if(activeLabel.textContent!==labelText)activeLabel.textContent=labelText;if(!activeLabel.hidden){activeLabel.style.transform=`translate3d(${sx}px,${sy}px,0) translate(-50%,-100%)`;activeLabel.style.left='0';activeLabel.style.top='0';}
  if(now-lastUI>100){drawUI(snapshot());lastUI=now;}
  if(naturalPlan&&time>=duration&&!scheduling&&!$('scheduleStatus').classList.contains('bad')){putText('scheduleStatus',`目标已完成 · ${naturalPlan.summary}\n${naturalPlan.roomIds.length} 个目标模块已到达规划位置并高亮。`);}
@@ -425,9 +465,10 @@ function draw(dt,now,force=false){
 }
 function resize(){resizeRenderTargets(Math.max(1,stage.clientWidth),Math.max(1,stage.clientHeight));if(studioMode){if(studioTransition.active)cancelStudioSwitch(true);focusStudio();}requestRender();}
 new ResizeObserver(resize).observe(stage);resize();
-renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();if(studioTransition.active)cancelStudioSwitch(true);playing=false;$('error').hidden=false;putText('error','显卡渲染上下文已丢失。请刷新页面恢复三维场景。');controls();});
+renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();renderContextLost=true;interactionAudio.silence(true);if(studioTransition.active)cancelStudioSwitch(true);playing=false;$('error').hidden=false;putText('error','显卡渲染暂时中断，正在等待恢复；人物与搬运进度已冻结。');controls();});
+renderer.domElement.addEventListener('webglcontextrestored',()=>{renderContextLost=false;lastNow=performance.now();renderDiagnostics.reset();invalidateRoomInstances();applyQuality();$('error').hidden=true;requestRender();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(studioTransition.active)cancelStudioSwitch(true);playing=false;held.clear();if(benchmark)finishBenchmark(true);controls();}else requestRender();lastNow=performance.now();});
-putText('qualityLabel',configureRenderer($('quality').value||'high',$('aaMode').value||'auto'));
+putText('qualityLabel',configureRenderer($('quality').value||'performance',$('aaMode').value||'auto'));
 compile('vertical',false);
 let fpsFrames=0,fpsElapsed=0;const frameSamples=[];const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if(reducedMotion){yaw=goal.yaw;pitch=goal.pitch;distance=goal.distance;target.copy(goal.target);}
@@ -441,7 +482,7 @@ function updateRenderDiagnostics(){
 }
 function frame(now){
  rafPending=false;inFrame=true;
- if(document.hidden){needsRender=true;inFrame=false;return;}
+ if(document.hidden||renderContextLost){needsRender=true;inFrame=false;return;}
  const ongoing=Boolean(fengPeng?.needsFrames)||playing||walking||studioTransition.active||cameraChanging()||Boolean(benchmark)||(roaming&&held.size>0),fpsLimit=Number($('targetFps').value),frameBudget=fpsLimit>0?1000/fpsLimit:0;
  // Native mode submits every available browser frame. Optional caps keep their
  // accumulated phase instead of discarding the remainder at each submission.
@@ -449,20 +490,23 @@ function frame(now){
  const realDt=Math.max(.0001,(now-lastNow)/1000),dt=Math.min(.1,realDt);lastNow=now;flowClock+=Math.min(realDt,.1);
  if(studioTransition.step(now)){needsRender=true;if(!studioTransition.active){studioTarget=null;studioCommit=null;updateStudioUI();}}
  if(benchmark){const elapsed=now-benchmark.start;if(elapsed<9000){goal.yaw=benchmark.initialYaw+(elapsed/1000)*.15;yaw=goal.yaw;if(elapsed>1000&&benchmark.last){benchmark.samples.push(now-benchmark.last);}benchmark.last=now;if(elapsed>1000)putText('benchmarkStatus',`采样中 · ${Math.min(8,Math.floor((elapsed-1000)/1000))}/8 秒`);}else finishBenchmark();}
- if(playing){const before=pendingManual?snapshot():null;time+=realDt*Number($('speed').value);
+ if(playing){const before=pendingManual?snapshot():null,previousTime=time;time+=realDt*Number($('speed').value);
+  if(pendingManual&&before?.phase){const dock=phases.find(p=>p.type==='dock'&&p.moveIndex===before.phase.moveIndex);if(dock)time=Math.min(time,dock.end);}
+  transportFeedback(phases,previousTime,Math.min(time,duration));
   if(pendingManual&&before?.phase){const docking=phases.find(p=>p.type==='dock'&&p.moveIndex===before.phase.moveIndex);if(docking&&time>=docking.end){time=docking.end;enterManual();}}
   if(time>=duration&&phases.length){time=duration;playing=false;audit('complete');if($('loop').checked&&!manualMode){time=0;playing=true;audit('loop');}controls();}
  }
  fengPeng?.tick(Math.min(.25,realDt));
- const active=Boolean(fengPeng?.needsFrames)||needsRender||playing||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||hasPendingRefinement(),force=needsRender;needsRender=false;
+ const active=dockingFlashes.size>0||Boolean(fengPeng?.needsFrames)||needsRender||playing||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||hasPendingRefinement(),force=needsRender;needsRender=false;
  if(active){draw(dt,now,force);nextRenderDeadline=frameBudget?(nextRenderDeadline===0||now+.5<nextRenderDeadline||now-nextRenderDeadline>frameBudget?now+frameBudget:nextRenderDeadline+frameBudget):0;if(realDt<.5){frameSamples.push(realDt*1000);if(frameSamples.length>480)frameSamples.shift();fpsFrames++;fpsElapsed+=realDt;}
   if(fpsElapsed>1){putText('fps',Math.round(fpsFrames/fpsElapsed));const sorted=frameSamples.slice().sort((a,b)=>a-b);putText('frameTime',sorted[Math.floor((sorted.length-1)*.95)].toFixed(1));fpsFrames=0;fpsElapsed=0;}
   if(now-lastDiagnosticsAt>=1000){updateRenderDiagnostics();lastDiagnosticsAt=now;}$('loading').hidden=true;
  }
- inFrame=false;if(!rafPending&&(fengPeng?.needsFrames||playing||studioTransition.active||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||needsRender||hasPendingRefinement())){rafPending=true;requestAnimationFrame(frame);}
+ inFrame=false;if(!rafPending&&(dockingFlashes.size>0||fengPeng?.needsFrames||playing||studioTransition.active||cameraChanging()||Boolean(benchmark)||(walking&&Number($('flowDemand').value)>0)||(roaming&&held.size>0)||needsRender||hasPendingRefinement())){rafPending=true;requestAnimationFrame(frame);}
 }
 fengPeng=createFengPeng();
  window.LunarisCharacterDiagnostics=()=>fengPeng.export();
- window.LunarisAudioDiagnostics=()=>backgroundAudio.diagnostics();
+ window.LunarisAudioDiagnostics=()=>({...interactionAudio.diagnostics(),dockingRooms:[...dockingFlashes.keys()]});
+ window.LunarisRenderDiagnostics=()=>({quality:qualityMode,contextLost:renderContextLost,cameraPosition:camera.position.toArray(),cameraInsideStructure:!!fengPeng.state.follow&&followBounds.containsPoint(camera.position),floor:visibleFloor,sectionRoom:sectionMode?selectedRoom:-1,transferring:fengPeng.transferring,drawSize:renderer.getDrawingBufferSize(drawingSize).toArray(),samples:aaSamples,aoSamples:renderProfiles[qualityMode].aoSamples,shadowSize:sun.shadow.mapSize.x,accumulationCount,passes:qualityMode==='performance'?2:renderProfiles[qualityMode].aoSamples?5:4,shadowUpdates,...inspectRoomInstances(),...getRenderDiagnostics()});
  requestRender();
 })();

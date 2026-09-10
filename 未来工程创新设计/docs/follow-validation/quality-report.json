@@ -1,0 +1,50 @@
+{
+  "errors": [],
+  "viewport": [
+    1600,
+    1000
+  ],
+  "headless": true,
+  "results": [
+    {
+      "mode": "performance",
+      "benchmark": "高性能 239 FPS · P95 4.3 ms · 1915 帧",
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5060 Laptop GPU (0x00002D59) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "cpuMs": 1.7202861442890336,
+      "gpuMs": 2.3745520022813276,
+      "passes": 2,
+      "samples": 0,
+      "aoSamples": 0,
+      "shadowSize": 2048,
+      "accumulationCount": 0
+    },
+    {
+      "mode": "high",
+      "benchmark": "精细 240 FPS · P95 4.3 ms · 1921 帧",
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5060 Laptop GPU (0x00002D59) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "cpuMs": 1.824004756626095,
+      "gpuMs": 2.617602037397333,
+      "passes": 5,
+      "samples": 4,
+      "aoSamples": 8,
+      "shadowSize": 4096,
+      "accumulationCount": 0
+    },
+    {
+      "mode": "cinematic",
+      "benchmark": "电影级 240 FPS · P95 4.3 ms · 1921 帧",
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5060 Laptop GPU (0x00002D59) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "cpuMs": 1.6928580301265792,
+      "gpuMs": 3.3405254787380607,
+      "passes": 5,
+      "samples": 8,
+      "aoSamples": 32,
+      "shadowSize": 6144,
+      "accumulationCount": 16
+    }
+  ],
+  "fourKDrawSize": [
+    2591,
+    1422
+  ]
+}
